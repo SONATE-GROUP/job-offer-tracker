@@ -72,6 +72,7 @@ const IMPORT_FIELDS: ImportField[] = [
   { key: "toContact", label: "À contacter", group: "Statuts" },
   { key: "doNotContact", label: "Ne pas contacter", group: "Statuts" },
   { key: "recruitingAgency", label: "Cabinet recrutement", group: "Statuts" },
+  { key: "agencyName", label: "Nom du cabinet", group: "Entreprise" },
   { key: "callRequested", label: "Appel demandé", group: "Statuts" },
   { key: "phoneLookupRequested", label: "Chercher téléphone", group: "Statuts" },
   { key: "enrichedPhone", label: "Téléphone enrichi", group: "Statuts" },

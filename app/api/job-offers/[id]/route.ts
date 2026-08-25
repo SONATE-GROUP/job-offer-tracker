@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const ALLOWED_TEXT_FIELDS = ["leadCivility", "leadFirstName", "leadLastName"] as const;
+const ALLOWED_TEXT_FIELDS = ["leadCivility", "leadFirstName", "leadLastName", "agencyName"] as const;
 type AllowedTextField = typeof ALLOWED_TEXT_FIELDS[number];
 
 type UpdatableField = AllowedTextField | "url";

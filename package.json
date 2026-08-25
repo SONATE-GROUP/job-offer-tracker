@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test:csv-update": "tsx scripts/test-csv-update-plan.ts",
     "test:csv-parse": "tsx scripts/test-csv-parse.ts",
+    "test:company-identity": "tsx scripts/test-company-identity.ts",
     "emelia:list-campaigns": "tsx scripts/list-emelia-campaigns.ts",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",

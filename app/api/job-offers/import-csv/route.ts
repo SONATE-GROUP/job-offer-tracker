@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
       toContact: parseBoolean(mappedValue(row, mapping, "toContact")),
       doNotContact: parseBoolean(mappedValue(row, mapping, "doNotContact")),
       recruitingAgency: parseBoolean(mappedValue(row, mapping, "recruitingAgency")),
+      agencyName: cleanString(mappedValue(row, mapping, "agencyName"), 500),
       callRequested: parseBoolean(mappedValue(row, mapping, "callRequested")),
       phoneLookupRequested: parseBoolean(mappedValue(row, mapping, "phoneLookupRequested")),
       enrichedPhone: cleanString(mappedValue(row, mapping, "enrichedPhone"), 50),

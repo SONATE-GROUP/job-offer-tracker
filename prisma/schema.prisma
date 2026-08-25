@@ -148,6 +148,8 @@ model JobOffer {
 
   // Cabinet de recrutement
   recruitingAgency    Boolean   @default(false)
+  // Nom du cabinet, renseigné uniquement quand recruitingAgency est vrai.
+  agencyName          String?
 
   // Appel demandé (depuis Google Sheets / externe)
   callRequested       Boolean   @default(false)

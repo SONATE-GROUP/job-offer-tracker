@@ -75,6 +75,7 @@ export async function GET(req: NextRequest) {
       { key: "toContactRaw", label: "À contacter", value: (o) => (o.toContact ? "Oui" : "Non") },
       { key: "doNotContact", label: "Ne pas contacter", value: (o) => (o.doNotContact ? "Oui" : "Non") },
       { key: "recruitingAgency", label: "Cabinet recrutement", value: (o) => (o.recruitingAgency ? "Oui" : "Non") },
+      { key: "agencyName", label: "Nom du cabinet", value: (o) => o.agencyName ?? "" },
       { key: "title", label: "Offre d'emploi", value: (o) => o.title },
       { key: "url", label: "URL de l'offre", value: (o) => o.url ?? "" },
       { key: "description", label: "Description", value: (o) => o.description ?? "" },

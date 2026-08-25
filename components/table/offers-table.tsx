@@ -39,6 +39,7 @@ interface JobOffer {
   leadPhone: string | null;
   toContact: boolean;
   recruitingAgency: boolean;
+  agencyName: string | null;
   doNotContact: boolean;
   contactedAt: string | null;
   lgmSent: boolean;
@@ -75,6 +76,7 @@ interface OffersTableProps {
 const FIXED_COLUMNS = [
   { key: "toContact", label: "CONTACTER", defaultWidth: 160 },
   { key: "recruitingAgency", label: "Cabinet recrutement", defaultWidth: 150 },
+  { key: "agencyName", label: "Nom du cabinet", defaultWidth: 180 },
   { key: "title", label: "Offre d'emploi", defaultWidth: 220 },
   { key: "url", label: "URL de l'offre", defaultWidth: 220 },
   { key: "description", label: "Description", defaultWidth: 250 },
@@ -319,7 +321,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     );
   }
 
-  async function updateLeadField(offerId: string, field: "leadCivility" | "leadFirstName" | "leadLastName", value: string | null) {
+  async function updateLeadField(offerId: string, field: "leadCivility" | "leadFirstName" | "leadLastName" | "agencyName", value: string | null) {
     await fetch(`/api/job-offers/${offerId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -858,6 +860,38 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                           className="w-4 h-4 cursor-pointer"
                           style={{ accentColor: "#FFBEFA" }}
                         />
+                      </td>
+                    )}
+
+                    {/* agencyName */}
+                    {!hiddenColumns.has("agencyName") && (
+                      <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                        {offer.recruitingAgency ? (
+                          <input
+                            type="text"
+                            defaultValue={offer.agencyName ?? ""}
+                            onBlur={(e) => updateLeadField(offer.id, "agencyName", e.target.value.trim() || null)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                              if (e.key === "Escape") {
+                                e.currentTarget.value = offer.agencyName ?? "";
+                                e.currentTarget.blur();
+                              }
+                            }}
+                            placeholder="—"
+                            title={offer.agencyName ?? undefined}
+                            className="border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-brand-pink w-full min-w-0"
+                          />
+                        ) : (
+                          // Grisé hors cabinet : le champ n'a de sens que si
+                          // l'offre est publiée par un cabinet de recrutement.
+                          <span
+                            className="text-gray-300 text-sm select-none"
+                            title="Coche « Cabinet recrutement » pour renseigner le nom du cabinet"
+                          >
+                            —
+                          </span>
+                        )}
                       </td>
                     )}
 
