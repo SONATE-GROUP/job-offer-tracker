@@ -76,7 +76,7 @@ const FIXED_COLUMNS = [
   { key: "toContact", label: "CONTACTER", defaultWidth: 160 },
   { key: "recruitingAgency", label: "Cabinet recrutement", defaultWidth: 150 },
   { key: "title", label: "Offre d'emploi", defaultWidth: 220 },
-  { key: "url", label: "URL de l'offre", defaultWidth: 130 },
+  { key: "url", label: "URL de l'offre", defaultWidth: 220 },
   { key: "description", label: "Description", defaultWidth: 250 },
   { key: "company", label: "Entreprise", defaultWidth: 180 },
   { key: "linkedinPage", label: "LinkedIn entreprise", defaultWidth: 150 },
@@ -160,6 +160,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
   const [showAddField, setShowAddField] = useState(false);
   const [showImportCsv, setShowImportCsv] = useState(false);
   const [editingPromptField, setEditingPromptField] = useState<CustomField | null>(null);
+  const [urlError, setUrlError] = useState<Record<string, string>>({});
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState<Set<string>>(new Set());
   const [syncingLgm, setSyncingLgm] = useState(false);
@@ -321,6 +322,35 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     });
     setOffers((prev) =>
       prev.map((o) => (o.id === offerId ? { ...o, [field]: value } : o))
+    );
+  }
+
+  async function updateOfferUrl(offerId: string, value: string, input: HTMLInputElement) {
+    const current = offers.find((o) => o.id === offerId)?.url ?? "";
+    const trimmed = value.trim();
+    if (trimmed === current) return;
+
+    const res = await fetch(`/api/job-offers/${offerId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: trimmed }),
+    });
+
+    if (!res.ok) {
+      setUrlError((prev) => ({ ...prev, [offerId]: "URL invalide" }));
+      input.value = current;
+      return;
+    }
+
+    const updated = await res.json();
+    setUrlError((prev) => {
+      const next = { ...prev };
+      delete next[offerId];
+      return next;
+    });
+    input.value = updated.url ?? "";
+    setOffers((prev) =>
+      prev.map((o) => (o.id === offerId ? { ...o, url: updated.url ?? null } : o))
     );
   }
 
@@ -840,13 +870,36 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
 
                     {/* url */}
                     {!hiddenColumns.has("url") && (
-                      <td className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                        {offer.url ? (
-                          <a href={offer.url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-brand-dark underline hover:text-brand-pink">
-                            Voir
-                          </a>
-                        ) : <span className="text-gray-400">—</span>}
+                      <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="text"
+                            defaultValue={offer.url ?? ""}
+                            onBlur={(e) => updateOfferUrl(offer.id, e.target.value, e.target)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                              if (e.key === "Escape") {
+                                e.currentTarget.value = offer.url ?? "";
+                                e.currentTarget.blur();
+                              }
+                            }}
+                            placeholder="—"
+                            title={urlError[offer.id] ?? offer.url ?? undefined}
+                            className={cn(
+                              "border rounded px-1 py-0.5 text-xs text-gray-600 bg-transparent focus:outline-none focus:ring-1 w-full min-w-0",
+                              urlError[offer.id]
+                                ? "border-red-400 focus:border-red-500 focus:ring-red-400"
+                                : "border-transparent hover:border-gray-300 focus:border-brand-pink focus:ring-brand-pink"
+                            )}
+                          />
+                          {offer.url && (
+                            <a href={offer.url} target="_blank" rel="noopener noreferrer"
+                              title="Ouvrir l'offre"
+                              className="text-xs text-brand-dark underline hover:text-brand-pink shrink-0">
+                              Voir
+                            </a>
+                          )}
+                        </div>
                       </td>
                     )}
 
