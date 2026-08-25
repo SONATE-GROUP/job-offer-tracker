@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { retryAfterEnsuringRecruitingAgencyColumn } from "@/lib/job-offer-schema";
 import { resolveWorkspaceId } from "@/lib/workspace-access";
 import { normalizeLinkedinUrl } from "@/lib/linkedin";
+import { buildOfferFilterClauses } from "@/lib/offer-filters";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -16,21 +17,6 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") ?? "";
 
-  const where: Record<string, unknown> = {
-    workspaceId,
-    ...(search
-      ? {
-          OR: [
-            { title: { contains: search } },
-            { company: { contains: search } },
-            { leadFirstName: { contains: search } },
-            { leadLastName: { contains: search } },
-            { leadEmail: { contains: search } },
-          ],
-        }
-      : {}),
-  };
-
   const rawSortBy = searchParams.get("sortBy") ?? "receivedAt";
   const rawSortDir = searchParams.get("sortDir") ?? "desc";
   const filterStatus = searchParams.get("filterStatus");
@@ -40,13 +26,38 @@ export async function GET(req: NextRequest) {
   const sortBy = SORTABLE.includes(rawSortBy) ? rawSortBy : "receivedAt";
   const sortDir = rawSortDir === "asc" ? "asc" : "desc";
 
+  // Chaque critère est une clause distincte combinée en AND. Les empiler à plat
+  // sur `where` écraserait le OR de la recherche par celui des statuts — c'était
+  // le cas jusqu'ici : filtrer par statut annulait silencieusement la recherche.
+  const andClauses: Record<string, unknown>[] = [];
+
+  if (search) {
+    andClauses.push({
+      OR: [
+        { title: { contains: search } },
+        { company: { contains: search } },
+        { agencyName: { contains: search } },
+        { leadFirstName: { contains: search } },
+        { leadLastName: { contains: search } },
+        { leadEmail: { contains: search } },
+      ],
+    });
+  }
+
   if (activeStatuses.length > 0) {
     const orClauses: Record<string, unknown>[] = [];
     if (activeStatuses.includes("qualify")) orClauses.push({ toContact: false, doNotContact: false });
     if (activeStatuses.includes("contact")) orClauses.push({ toContact: true });
     if (activeStatuses.includes("doNotContact")) orClauses.push({ doNotContact: true });
-    if (orClauses.length > 0) Object.assign(where, { OR: orClauses });
+    if (orClauses.length > 0) andClauses.push({ OR: orClauses });
   }
+
+  andClauses.push(...buildOfferFilterClauses(searchParams));
+
+  const where: Record<string, unknown> = {
+    workspaceId,
+    ...(andClauses.length > 0 ? { AND: andClauses } : {}),
+  };
 
   if (searchParams.get("format") === "csv") {
     const [allOffers, customFieldDefs] = await retryAfterEnsuringRecruitingAgencyColumn(() =>
@@ -185,11 +196,24 @@ export async function GET(req: NextRequest) {
     return { ...offer, customValues, duplicateWarning: computeDuplicateWarning(offer.id, offer.leadLinkedin) };
   });
 
+  // Valeurs distinctes de « Source », pour alimenter la liste déroulante du
+  // panneau de filtres. Calculé sur tout le workspace, pas sur la page courante.
+  const sourceRows = await prisma.jobOffer.findMany({
+    where: { workspaceId, source: { not: null } },
+    select: { source: true },
+    distinct: ["source"],
+    orderBy: { source: "asc" },
+  });
+  const sources = sourceRows
+    .map((row) => row.source)
+    .filter((source): source is string => !!source && source.trim() !== "");
+
   return NextResponse.json({
     data,
     total,
     page,
     limit,
+    sources,
     stats: {
       all: statsAll,
       toContact: statsToContact,
