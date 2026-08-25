@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { parseCsv } from "@/lib/csv-parse";
 
 interface CustomField {
@@ -32,6 +32,15 @@ interface UpdateSummary {
   duplicateId: number;
   onlyEmpty: boolean;
   samples: { id: string; fields: string[] }[];
+  fieldStats: Record<string, FieldStat>;
+}
+
+interface FieldStat {
+  toFill: number;
+  alreadyFilled: number;
+  blankInCsv: number;
+  identical: number;
+  invalid: number;
 }
 
 interface ImportField {
@@ -86,6 +95,13 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
     label: field.label,
     group: "Champs personnalisés",
   })), [customFields]);
+
+  /** Libellé lisible d'une colonne, qu'elle soit fixe ou personnalisée. */
+  const fieldLabel = useCallback((key: string) => {
+    const fixed = IMPORT_FIELDS.find((field) => field.key === key);
+    if (fixed) return fixed.label;
+    return customFields.find((field) => field.name === key)?.label ?? key;
+  }, [customFields]);
 
   async function handleFileChange(file: File | undefined) {
     if (!file) return;
@@ -353,6 +369,46 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
               <SummaryStat label="Id introuvables" value={summary.notFound} />
               <SummaryStat label="Déjà remplies" value={summary.skippedFilled} />
             </div>
+            {Object.keys(summary.fieldStats).length > 0 && (
+              <div className="border border-gray-200 rounded-lg overflow-hidden mb-3">
+                <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-brand-dark">
+                  Détail par colonne, sur les {summary.matched} ligne{summary.matched > 1 ? "s" : ""} rapprochée{summary.matched > 1 ? "s" : ""}
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 text-gray-600">
+                        <th className="text-left px-3 py-2 font-medium">Colonne</th>
+                        <th className="text-right px-3 py-2 font-medium">À remplir</th>
+                        <th className="text-right px-3 py-2 font-medium">Déjà remplie</th>
+                        <th className="text-right px-3 py-2 font-medium">Vide dans le CSV</th>
+                        <th className="text-right px-3 py-2 font-medium">Identique</th>
+                        <th className="text-right px-3 py-2 font-medium">Inexploitable</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(summary.fieldStats).map(([key, stat]) => (
+                        <tr key={key} className="border-b border-gray-100 last:border-0">
+                          <td className="px-3 py-2 text-brand-dark whitespace-nowrap">{fieldLabel(key)}</td>
+                          <td className={cellClass(stat.toFill > 0)}>{stat.toFill}</td>
+                          <td className="px-3 py-2 text-right text-gray-600">{stat.alreadyFilled}</td>
+                          <td className="px-3 py-2 text-right text-gray-600">{stat.blankInCsv}</td>
+                          <td className="px-3 py-2 text-right text-gray-600">{stat.identical}</td>
+                          <td className="px-3 py-2 text-right text-gray-600">{stat.invalid}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="px-3 py-2 text-xs text-gray-500 border-t border-gray-100">
+                  « Déjà remplie » = l&apos;offre a déjà une valeur dans cette colonne. Elle est protégée
+                  tant que « Ne remplir que les cellules vides » est coché. Une colonne dont tout est
+                  « Déjà remplie » n&apos;apporte rien : laisse-la sur « Ne pas importer » pour ne pas
+                  masquer les colonnes réellement à remplir.
+                </p>
+              </div>
+            )}
+
             <ul className="text-xs text-gray-500 space-y-1">
               {summary.unchanged > 0 && (
                 <li>{summary.unchanged} ligne{summary.unchanged > 1 ? "s" : ""} identique{summary.unchanged > 1 ? "s" : ""} à la valeur déjà en base.</li>
@@ -466,4 +522,10 @@ function SummaryStat({ label, value, highlight }: { label: string; value: number
       <div className="text-xs text-gray-500">{label}</div>
     </div>
   );
+}
+
+function cellClass(highlight: boolean): string {
+  return highlight
+    ? "px-3 py-2 text-right font-semibold text-brand-dark"
+    : "px-3 py-2 text-right text-gray-400";
 }

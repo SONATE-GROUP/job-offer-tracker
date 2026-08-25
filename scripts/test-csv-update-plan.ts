@@ -97,5 +97,50 @@ check("ajoute https:// si absent", cleanUrl("www.hellowork.com/offre"), "https:/
 check("rejette une valeur non-URL", cleanUrl("aucune"), null);
 check("conserve une URL complète", cleanUrl("http://x.fr/a"), "http://x.fr/a");
 
+// 9. Détail par colonne : le cas qui prêtait à confusion.
+// URL vide en base, description déjà remplie, les deux colonnes associées.
+const mixteOffers: OfferSnapshot[] = [
+  { id: "b1", url: null, description: "Description existante", customValues: "{}" },
+  { id: "b2", url: null, description: "Description existante", customValues: "{}" },
+];
+const r9 = planOfferUpdates({
+  ...base,
+  mapping: { url: "URL", description: "Description" },
+  offers: mixteOffers,
+  rows: [
+    { id: "b1", URL: "https://a.fr/1", Description: "Autre texte" },
+    { id: "b2", URL: "https://a.fr/2", Description: "Autre texte" },
+  ],
+});
+check("les 2 URL vides sont bien à remplir", r9.summary.fieldStats.url.toFill, 2);
+check("aucune URL n'est comptée déjà remplie", r9.summary.fieldStats.url.alreadyFilled, 0);
+check("les 2 descriptions sont protégées", r9.summary.fieldStats.description.alreadyFilled, 2);
+check("les descriptions ne sont pas écrites", r9.summary.fieldStats.description.toFill, 0);
+check("les lignes comptent quand même comme à mettre à jour", r9.summary.toUpdate, 2);
+check("seule l'url est écrite", Object.keys(r9.updates[0].data), ["url"]);
+
+// 10. Colonne entièrement déjà remplie : rien à faire, et ça se voit par colonne.
+const r10 = planOfferUpdates({
+  ...base,
+  mapping: { description: "Description" },
+  offers: mixteOffers,
+  rows: [
+    { id: "b1", Description: "Autre texte" },
+    { id: "b2", Description: "Autre texte" },
+  ],
+});
+check("aucune offre à remplir", r10.summary.toUpdate, 0);
+check("le compteur par colonne l'explique", r10.summary.fieldStats.description.alreadyFilled, 2);
+
+// 11. Cellule vide du CSV distinguée d'une valeur déjà en base
+const r11 = planOfferUpdates({
+  ...base,
+  mapping: { url: "URL" },
+  offers: mixteOffers,
+  rows: [{ id: "b1", URL: "" }, { id: "b2", URL: "https://a.fr/2" }],
+});
+check("cellule vide comptée à part", r11.summary.fieldStats.url.blankInCsv, 1);
+check("l'autre ligne est à remplir", r11.summary.fieldStats.url.toFill, 1);
+
 console.log(failures === 0 ? "\nTous les cas passent." : `\n${failures} cas en échec.`);
 process.exit(failures === 0 ? 0 : 1);
