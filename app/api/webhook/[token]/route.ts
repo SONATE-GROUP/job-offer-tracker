@@ -2,6 +2,7 @@ import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { callAIProvider } from "@/lib/ai-generate";
 import { normalizeLinkedinUrl } from "@/lib/linkedin";
+import { resolveCompanyIdentity } from "@/lib/company-identity";
 
 // Simple in-memory rate limiter: max 60 requests per minute per token
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -109,6 +110,7 @@ export async function POST(
       const leadLinkedin = sanitizeUrl(lead.lead_linkedin);
       const recruitingAgency =
         "search_name" in lead ? isRecruitingAgencySearch(lead.search_name) : defaultRecruitingAgency;
+      const identity = resolveCompanyIdentity(lead, recruitingAgency, { sanitizeString, sanitizeUrl });
 
       let duplicateWarning: string | null = null;
       if (leadLinkedin) {
@@ -134,9 +136,10 @@ export async function POST(
           title: sanitizeString(lead.job_offer_title) ?? "Sans titre",
           description: sanitizeString(lead.job_offer_description, 10000),
           url: sanitizeUrl(lead.job_offer_url),
-          company: sanitizeString(lead.company_name) ?? "Inconnu",
-          linkedinPage: sanitizeUrl(lead.company_linkedin),
-          website: sanitizeUrl(lead.company_website),
+          company: identity.company ?? "Inconnu",
+          agencyName: identity.agencyName,
+          linkedinPage: identity.linkedinPage,
+          website: identity.website,
           phone: sanitizeString(lead.company_phone, 50),
           headquarters: sanitizeString(lead.hq_location, 500),
           offerLocation: sanitizeString(lead.job_offer_location, 500),

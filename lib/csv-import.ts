@@ -25,6 +25,7 @@ export type JobOfferField =
   | "toContact"
   | "doNotContact"
   | "recruitingAgency"
+  | "agencyName"
   | "callRequested"
   | "phoneLookupRequested"
   | "enrichedPhone";
@@ -55,6 +56,7 @@ export const UPDATABLE_FIELDS: JobOfferField[] = [
   "toContact",
   "doNotContact",
   "recruitingAgency",
+  "agencyName",
   "callRequested",
   "phoneLookupRequested",
   "enrichedPhone",
@@ -145,6 +147,7 @@ export function buildFieldValue(field: JobOfferField, raw: unknown): string | bo
   switch (field) {
     case "title":
     case "company":
+    case "agencyName":
     case "headquarters":
     case "offerLocation":
       return cleanString(raw, 500);
