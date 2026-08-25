@@ -12,6 +12,7 @@ export interface CompanyIdentity {
   company: string | null;
   linkedinPage: string | null;
   website: string | null;
+  headquarters: string | null;
 }
 
 export interface IdentitySanitizers {
@@ -30,6 +31,7 @@ const REVERSE_OBJECT_KEYS = ["reverse_company", "reverseCompany"];
 const REVERSE_NAME_KEYS = ["reverse_company_name", "Reverse Company name"];
 const REVERSE_LINKEDIN_KEYS = ["reverse_company_linkedin", "Reverse Company LinkedIn"];
 const REVERSE_WEBSITE_KEYS = ["reverse_company_website", "Reverse Company Website"];
+const REVERSE_HQ_KEYS = ["reverse_company_hq_location", "Reverse Company HQ Location"];
 
 /** Renvoie l'objet entreprise cliente s'il est présent et exploitable. */
 export function reverseCompanyOf(lead: Record<string, unknown>): Record<string, unknown> | null {
@@ -68,7 +70,14 @@ export function resolveCompanyIdentity(
   const companyName = sanitizeString(lead.company_name, 500);
   const linkedinPage = sanitizeUrl(lead.company_linkedin);
   const website = sanitizeUrl(lead.company_website);
-  const unchanged: CompanyIdentity = { agencyName: null, company: companyName, linkedinPage, website };
+  const headquarters = sanitizeString(lead.hq_location, 500);
+  const unchanged: CompanyIdentity = {
+    agencyName: null,
+    company: companyName,
+    linkedinPage,
+    website,
+    headquarters,
+  };
 
   if (!recruitingAgency) return unchanged;
 
@@ -82,17 +91,21 @@ export function resolveCompanyIdentity(
   const clientName = rawClientName?.trim() || null;
   if (!clientName) return unchanged;
 
-  const clientLinkedin =
-    sanitizeUrl(reverse ? reverse.company_linkedin : null) ??
-    sanitizeUrl(pickField(lead, REVERSE_LINKEDIN_KEYS));
-  const clientWebsite =
-    sanitizeUrl(reverse ? reverse.company_website : null) ??
-    sanitizeUrl(pickField(lead, REVERSE_WEBSITE_KEYS));
-
+  // Une fois l'entreprise remplacée par le client, les champs qui la décrivent
+  // ne peuvent plus provenir du cabinet : un site web ou un siège hérités de
+  // l'agence désigneraient la mauvaise société. Mieux vaut vide que trompeur.
   return {
     agencyName: companyName,
     company: clientName,
-    linkedinPage: clientLinkedin ?? linkedinPage,
-    website: clientWebsite ?? website,
+    linkedinPage:
+      sanitizeUrl(reverse ? reverse.company_linkedin : null) ??
+      sanitizeUrl(pickField(lead, REVERSE_LINKEDIN_KEYS)),
+    website:
+      sanitizeUrl(reverse ? reverse.company_website : null) ??
+      sanitizeUrl(pickField(lead, REVERSE_WEBSITE_KEYS)),
+    headquarters:
+      sanitizeString(reverse ? reverse.hq_location : null, 500)?.trim() ||
+      sanitizeString(pickField(lead, REVERSE_HQ_KEYS), 500)?.trim() ||
+      null,
   };
 }
