@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 const ALLOWED_TEXT_FIELDS = ["leadCivility", "leadFirstName", "leadLastName", "agencyName"] as const;
 type AllowedTextField = typeof ALLOWED_TEXT_FIELDS[number];
 
-type UpdatableField = AllowedTextField | "url";
+type NullableField = AllowedTextField | "url";
 
 /**
  * Normalise une URL saisie manuellement : ajoute le schéma https:// s'il manque
@@ -37,13 +37,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const body = await req.json();
-  const data: Partial<Record<UpdatableField, string | null>> = {};
+  // `company` est non-nullable côté Prisma, les autres champs acceptent NULL.
+  const data: Partial<Record<NullableField, string | null>> & { company?: string } = {};
 
   for (const field of ALLOWED_TEXT_FIELDS) {
     if (field in body) {
       const val = body[field];
       data[field] = typeof val === "string" && val.trim() !== "" ? val.trim() : null;
     }
+  }
+
+  // `company` est obligatoire en base : une valeur vide est refusée plutôt que
+  // transformée en NULL, ce qui ferait échouer l'écriture côté Prisma.
+  if ("company" in body) {
+    const val = body.company;
+    const trimmed = typeof val === "string" ? val.trim() : "";
+    if (trimmed === "") {
+      return NextResponse.json({ error: "L'entreprise ne peut pas être vide" }, { status: 400 });
+    }
+    data.company = trimmed.slice(0, 500);
   }
 
   if ("url" in body) {
