@@ -4,97 +4,24 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ensureRecruitingAgencyColumn } from "@/lib/job-offer-schema";
 import { resolveWorkspaceId } from "@/lib/workspace-access";
+import {
+  cleanString,
+  cleanUrl,
+  mappedValue,
+  normalizeCivility,
+  parseBoolean,
+  parseDate,
+  type CsvRow,
+  type FieldMapping,
+} from "@/lib/csv-import";
 
 const MAX_IMPORT_ROWS = 2_000;
 
-type JobOfferField =
-  | "title"
-  | "description"
-  | "url"
-  | "company"
-  | "linkedinPage"
-  | "website"
-  | "phone"
-  | "headquarters"
-  | "offerLocation"
-  | "source"
-  | "publishedAt"
-  | "leadCivility"
-  | "leadFirstName"
-  | "leadLastName"
-  | "leadEmail"
-  | "leadJobTitle"
-  | "leadLinkedin"
-  | "leadPhone"
-  | "toContact"
-  | "doNotContact"
-  | "recruitingAgency"
-  | "callRequested"
-  | "phoneLookupRequested"
-  | "enrichedPhone";
-type CsvRow = Record<string, unknown>;
-
 type ImportBody = {
   rows?: CsvRow[];
-  mapping?: Partial<Record<JobOfferField, string>>;
+  mapping?: FieldMapping;
   customMapping?: Record<string, string>;
 };
-
-function cleanString(value: unknown, maxLength = 1000): string | null {
-  if (value == null) return null;
-  const text = String(value).trim();
-  if (!text) return null;
-  return text.slice(0, maxLength);
-}
-
-function cleanUrl(value: unknown): string | null {
-  const text = cleanString(value, 2000);
-  if (!text) return null;
-  try {
-    const url = new URL(text);
-    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
-    return text;
-  } catch {
-    return null;
-  }
-}
-
-function parseBoolean(value: unknown): boolean {
-  const text = cleanString(value, 50)?.toLowerCase();
-  if (!text) return false;
-  return ["1", "true", "vrai", "oui", "yes", "y", "x", "checked", "contact", "contacté", "a contacter", "à contacter"].includes(text);
-}
-
-function parseDate(value: unknown): Date | null {
-  const text = cleanString(value, 100);
-  if (!text) return null;
-
-  const iso = new Date(text);
-  if (!Number.isNaN(iso.getTime())) return iso;
-
-  const frMatch = text.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
-  if (!frMatch) return null;
-
-  const [, day, month, rawYear] = frMatch;
-  const year = rawYear.length === 2 ? `20${rawYear}` : rawYear;
-  const parsed = new Date(Number(year), Number(month) - 1, Number(day));
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function mappedValue(row: CsvRow, mapping: Partial<Record<JobOfferField, string>>, field: JobOfferField): unknown {
-  const column = mapping[field];
-  if (!column) return null;
-  return row[column];
-}
-
-function normalizeCivility(value: unknown): string | null {
-  const text = cleanString(value, 30);
-  if (!text) return null;
-  const lower = text.toLowerCase();
-  if (["m", "m.", "mr", "mr.", "monsieur"].includes(lower)) return "Monsieur";
-  if (["mme", "madame", "ms", "ms.", "mrs", "mrs."].includes(lower)) return "Madame";
-  return text;
-}
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
