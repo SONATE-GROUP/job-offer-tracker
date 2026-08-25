@@ -68,49 +68,6 @@ const IMPORT_FIELDS: ImportField[] = [
   { key: "enrichedPhone", label: "Téléphone enrichi", group: "Statuts" },
 ];
 
-function normalizeLabel(value: string): string {
-  return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-}
-
-function guessColumn(headers: string[], labels: string[]): string {
-  const normalizedHeaders = headers.map((header) => ({ header, normalized: normalizeLabel(header) }));
-  for (const label of labels) {
-    const normalizedLabel = normalizeLabel(label);
-    const exact = normalizedHeaders.find((item) => item.normalized === normalizedLabel);
-    if (exact) return exact.header;
-  }
-  for (const label of labels) {
-    const normalizedLabel = normalizeLabel(label);
-    const partial = normalizedHeaders.find((item) => item.normalized.includes(normalizedLabel) || normalizedLabel.includes(item.normalized));
-    if (partial) return partial.header;
-  }
-  return "";
-}
-
-const ID_GUESS_LABELS = ["id", "identifiant", "offer id", "offer_id", "job_offer_id", "id offre"];
-
-const GUESS_LABELS: Record<string, string[]> = {
-  title: ["titre", "titre offre", "offre", "job title", "job_offer_title"],
-  description: ["description", "job_offer_description"],
-  url: ["url", "url offre", "job_offer_url"],
-  company: ["entreprise", "societe", "company", "company_name"],
-  linkedinPage: ["linkedin entreprise", "company_linkedin"],
-  website: ["site web", "website", "company_website"],
-  phone: ["telephone entreprise", "company_phone"],
-  headquarters: ["siege social", "hq_location"],
-  offerLocation: ["localisation", "job_offer_location"],
-  source: ["source", "job_offer_source"],
-  publishedAt: ["date offre", "date publication", "job_creation_date"],
-  leadCivility: ["civilite", "lead_civility"],
-  leadFirstName: ["prenom", "prenom lead", "lead_first_name"],
-  leadLastName: ["nom", "nom lead", "lead_last_name"],
-  leadEmail: ["email", "email lead", "lead_email"],
-  leadJobTitle: ["metier lead", "poste lead", "lead_job_title"],
-  leadLinkedin: ["linkedin lead", "lead_linkedin"],
-  leadPhone: ["telephone lead", "lead_phones"],
-  enrichedPhone: ["telephone enrichi", "numero de telephone", "enriched_phone"],
-};
-
 export function ImportCsvModal({ customFields, workspaceId, onClose, onImported }: ImportCsvModalProps) {
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, string>[]>([]);
@@ -146,19 +103,13 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
     setHeaders(parsed.headers);
     setRows(parsed.rows);
     setSummary(null);
-    setIdColumn(guessColumn(parsed.headers, ID_GUESS_LABELS));
 
-    const nextMapping: Record<string, string> = {};
-    for (const field of IMPORT_FIELDS) {
-      nextMapping[field.key] = guessColumn(parsed.headers, GUESS_LABELS[field.key] ?? [field.label, field.key]);
-    }
-    setMapping(nextMapping);
-
-    const nextCustomMapping: Record<string, string> = {};
-    for (const field of customFields) {
-      nextCustomMapping[field.name] = guessColumn(parsed.headers, [field.label, field.name]);
-    }
-    setCustomMapping(nextCustomMapping);
+    // Aucune association n'est devinée : une correspondance approximative peut
+    // viser la mauvaise colonne, et l'erreur passe facilement inaperçue. Tout
+    // part sur « Ne pas importer », c'est l'utilisateur qui associe.
+    setIdColumn("");
+    setMapping({});
+    setCustomMapping({});
   }
 
   async function handleImport() {
