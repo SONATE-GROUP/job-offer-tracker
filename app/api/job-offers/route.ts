@@ -68,7 +68,12 @@ export async function GET(req: NextRequest) {
 
     // Colonnes fixes, dans le même ordre et avec les mêmes clés que le tableau.
     const fixedColumns: { key: string; label: string; value: (offer: typeof allOffers[number]) => unknown }[] = [
+      // L'id vient en premier : c'est la clé qui permet de réimporter le fichier
+      // en mode « mise à jour » pour remplir des colonnes en masse.
+      { key: "id", label: "id", value: (o) => o.id },
       { key: "toContact", label: "Statut contact", value: (o) => (o.doNotContact ? "Ne pas contacter" : o.toContact ? "Contacté" : "À qualifier") },
+      { key: "toContactRaw", label: "À contacter", value: (o) => (o.toContact ? "Oui" : "Non") },
+      { key: "doNotContact", label: "Ne pas contacter", value: (o) => (o.doNotContact ? "Oui" : "Non") },
       { key: "recruitingAgency", label: "Cabinet recrutement", value: (o) => (o.recruitingAgency ? "Oui" : "Non") },
       { key: "title", label: "Offre d'emploi", value: (o) => o.title },
       { key: "url", label: "URL de l'offre", value: (o) => o.url ?? "" },
@@ -101,14 +106,18 @@ export async function GET(req: NextRequest) {
       { key: "lgmMessage1SentAt", label: "Message 1 envoyé", value: (o) => fmtDate(o.lgmMessage1SentAt) },
       { key: "lgmRepliedAt", label: "Réponse reçue", value: (o) => fmtDate(o.lgmRepliedAt) },
       { key: "lgmReplyContent", label: "Contenu réponse", value: (o) => o.lgmReplyContent ?? "" },
+      { key: "contactedAt", label: "Date de contact", value: (o) => fmtDate(o.contactedAt) },
+      { key: "lgmSentAt", label: "Date envoi LGM", value: (o) => fmtDate(o.lgmSentAt) },
+      { key: "lgmAudience", label: "Audience LGM", value: (o) => o.lgmAudience ?? "" },
+      { key: "lgmLeadId", label: "Id lead LGM", value: (o) => o.lgmLeadId ?? "" },
+      { key: "apolloEnrichmentStatus", label: "Statut enrichissement", value: (o) => o.apolloEnrichmentStatus ?? "" },
+      { key: "duplicateWarning", label: "Doublon détecté", value: (o) => o.duplicateWarning ?? "" },
     ];
 
-    // Si le client fournit la liste des colonnes visibles, on n'exporte que celles-ci.
-    const columnsParam = searchParams.get("columns");
-    const visibleKeys = columnsParam ? new Set(columnsParam.split(",").filter(Boolean)) : null;
-
-    const exportFixed = visibleKeys ? fixedColumns.filter((c) => visibleKeys.has(c.key)) : fixedColumns;
-    const exportCustom = visibleKeys ? customFieldDefs.filter((f) => visibleKeys.has(f.id)) : customFieldDefs;
+    // L'export est toujours complet : toutes les colonnes du tableau, quelles que
+    // soient celles masquées à l'écran, plus l'id et les champs personnalisés.
+    const exportFixed = fixedColumns;
+    const exportCustom = customFieldDefs;
 
     const headers = [...exportFixed.map((c) => c.label), ...exportCustom.map((f) => f.label)];
 
