@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { parseCsv } from "@/lib/csv-parse";
 
 interface CustomField {
   id: string;
@@ -66,52 +67,6 @@ const IMPORT_FIELDS: ImportField[] = [
   { key: "phoneLookupRequested", label: "Chercher téléphone", group: "Statuts" },
   { key: "enrichedPhone", label: "Téléphone enrichi", group: "Statuts" },
 ];
-
-function splitCsvLine(line: string, separator: string): string[] {
-  const cells: string[] = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let index = 0; index < line.length; index++) {
-    const char = line[index];
-    const next = line[index + 1];
-
-    if (char === '"' && inQuotes && next === '"') {
-      current += '"';
-      index++;
-    } else if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === separator && !inQuotes) {
-      cells.push(current.trim());
-      current = "";
-    } else {
-      current += char;
-    }
-  }
-
-  cells.push(current.trim());
-  return cells;
-}
-
-function parseCsv(text: string): { headers: string[]; rows: Record<string, string>[] } {
-  const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  const lines = normalized.split("\n").filter((line) => line.trim() !== "");
-  if (lines.length === 0) return { headers: [], rows: [] };
-
-  const firstLine = lines[0];
-  const separator = (firstLine.match(/;/g)?.length ?? 0) > (firstLine.match(/,/g)?.length ?? 0) ? ";" : ",";
-  const headers = splitCsvLine(firstLine, separator).map((header) => header.trim()).filter(Boolean);
-
-  const rows = lines.slice(1).map((line) => {
-    const cells = splitCsvLine(line, separator);
-    return headers.reduce<Record<string, string>>((acc, header, index) => {
-      acc[header] = cells[index] ?? "";
-      return acc;
-    }, {});
-  });
-
-  return { headers, rows };
-}
 
 function normalizeLabel(value: string): string {
   return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
