@@ -371,6 +371,33 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     );
   }
 
+  async function updateCompany(offerId: string, value: string, input: HTMLInputElement) {
+    const current = offers.find((o) => o.id === offerId)?.company ?? "";
+    const trimmed = value.trim();
+    // Champ obligatoire : on restaure plutôt que d'envoyer une valeur vide.
+    if (trimmed === "" || trimmed === current) {
+      input.value = current;
+      return;
+    }
+
+    const res = await fetch(`/api/job-offers/${offerId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ company: trimmed }),
+    });
+
+    if (!res.ok) {
+      input.value = current;
+      return;
+    }
+
+    const updated = await res.json();
+    input.value = updated.company ?? current;
+    setOffers((prev) =>
+      prev.map((o) => (o.id === offerId ? { ...o, company: updated.company ?? current } : o))
+    );
+  }
+
   async function updateOfferUrl(offerId: string, value: string, input: HTMLInputElement) {
     const current = offers.find((o) => o.id === offerId)?.url ?? "";
     const trimmed = value.trim();
@@ -1129,9 +1156,26 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
 
                     {/* Company */}
                     {!hiddenColumns.has("company") && (
-                      <td className="px-3 py-3" style={{ maxWidth: getColWidth("company", 180) }}>
-                        <div className="font-medium truncate text-brand-dark">{offer.company}</div>
-                        <div className="flex gap-2 mt-0.5">
+                      <td
+                        className="px-3 py-3"
+                        style={{ maxWidth: getColWidth("company", 180) }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="text"
+                          defaultValue={offer.company}
+                          onBlur={(e) => updateCompany(offer.id, e.target.value, e.target)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") e.currentTarget.blur();
+                            if (e.key === "Escape") {
+                              e.currentTarget.value = offer.company;
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          title={offer.company}
+                          className="font-medium text-brand-dark bg-transparent border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 w-full min-w-0 focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                        />
+                        <div className="flex gap-2 mt-0.5 px-1">
                           {offer.linkedinPage && (
                             <a
                               href={offer.linkedinPage}
