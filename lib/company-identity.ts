@@ -19,10 +19,28 @@ export interface IdentitySanitizers {
   sanitizeUrl: (value: unknown) => string | null;
 }
 
-/** Orthographes acceptées pour chaque champ reverse, du plus probable au moins. */
-const REVERSE_NAME_KEYS = ["reverse_company_name", "reverse_company_names", "Reverse Company name"];
+/**
+ * Le fournisseur imbrique l'entreprise cliente dans un objet `reverse_company`,
+ * dont les clés reprennent celles d'une entreprise ordinaire :
+ *   { company_name, company_website, company_linkedin, probability, ... }
+ */
+const REVERSE_OBJECT_KEYS = ["reverse_company", "reverseCompany"];
+
+/** Variantes à plat, conservées au cas où l'export CSV serait rejoué tel quel. */
+const REVERSE_NAME_KEYS = ["reverse_company_name", "Reverse Company name"];
 const REVERSE_LINKEDIN_KEYS = ["reverse_company_linkedin", "Reverse Company LinkedIn"];
 const REVERSE_WEBSITE_KEYS = ["reverse_company_website", "Reverse Company Website"];
+
+/** Renvoie l'objet entreprise cliente s'il est présent et exploitable. */
+export function reverseCompanyOf(lead: Record<string, unknown>): Record<string, unknown> | null {
+  for (const key of REVERSE_OBJECT_KEYS) {
+    const value = lead[key];
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      return value as Record<string, unknown>;
+    }
+  }
+  return null;
+}
 
 /** Première clé présente et non vide parmi les orthographes possibles. */
 export function pickField(source: Record<string, unknown>, keys: string[]): unknown {
@@ -54,13 +72,27 @@ export function resolveCompanyIdentity(
 
   if (!recruitingAgency) return unchanged;
 
-  const clientName = sanitizeString(pickField(lead, REVERSE_NAME_KEYS), 500);
+  const reverse = reverseCompanyOf(lead);
+
+  // Le nettoyage injecté ne coupe pas les espaces : un nom composé uniquement
+  // d'espaces doit être traité comme absent, pas écrit tel quel.
+  const rawClientName =
+    sanitizeString(reverse ? reverse.company_name : null, 500) ??
+    sanitizeString(pickField(lead, REVERSE_NAME_KEYS), 500);
+  const clientName = rawClientName?.trim() || null;
   if (!clientName) return unchanged;
+
+  const clientLinkedin =
+    sanitizeUrl(reverse ? reverse.company_linkedin : null) ??
+    sanitizeUrl(pickField(lead, REVERSE_LINKEDIN_KEYS));
+  const clientWebsite =
+    sanitizeUrl(reverse ? reverse.company_website : null) ??
+    sanitizeUrl(pickField(lead, REVERSE_WEBSITE_KEYS));
 
   return {
     agencyName: companyName,
     company: clientName,
-    linkedinPage: sanitizeUrl(pickField(lead, REVERSE_LINKEDIN_KEYS)) ?? linkedinPage,
-    website: sanitizeUrl(pickField(lead, REVERSE_WEBSITE_KEYS)) ?? website,
+    linkedinPage: clientLinkedin ?? linkedinPage,
+    website: clientWebsite ?? website,
   };
 }
