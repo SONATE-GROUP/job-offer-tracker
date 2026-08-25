@@ -196,6 +196,20 @@ export interface UpdatePlanInput {
   offers: OfferSnapshot[];
 }
 
+/** Ce qu'il advient d'une colonne donnée, ligne par ligne. */
+export interface FieldStat {
+  /** Sera écrite : la cellule du CSV a une valeur, celle de la base est vide. */
+  toFill: number;
+  /** Protégée : la base a déjà une valeur et « ne remplir que les cellules vides » est actif. */
+  alreadyFilled: number;
+  /** Ignorée : la cellule du CSV est vide, elle n'effacerait rien. */
+  blankInCsv: number;
+  /** Ignorée : le CSV répète la valeur déjà en base. */
+  identical: number;
+  /** Refusée : valeur inexploitable (URL invalide, date illisible…). */
+  invalid: number;
+}
+
 export interface UpdatePlan {
   updates: { id: string; data: Record<string, unknown> }[];
   ids: string[];
@@ -210,6 +224,8 @@ export interface UpdatePlan {
     missingId: number;
     duplicateId: number;
     samples: { id: string; fields: string[] }[];
+    /** Détail par colonne associée, sur les seules lignes rapprochées. */
+    fieldStats: Record<string, FieldStat>;
   };
 }
 
@@ -276,6 +292,13 @@ export function planOfferUpdates(input: UpdatePlanInput): UpdatePlan {
   let skippedFilled = 0;
   let invalidValues = 0;
 
+  const fieldStats: Record<string, FieldStat> = {};
+  function stat(key: string): FieldStat {
+    return (fieldStats[key] ??= { toFill: 0, alreadyFilled: 0, blankInCsv: 0, identical: 0, invalid: 0 });
+  }
+  for (const field of mappedFields) stat(field);
+  for (const [name] of mappedCustom) stat(name);
+
   for (const [id, row] of rowsById) {
     const offer = offersById.get(id);
     if (!offer) {
@@ -289,20 +312,29 @@ export function planOfferUpdates(input: UpdatePlanInput): UpdatePlan {
 
     for (const field of mappedFields) {
       const raw = row[mapping[field] as string];
-      if (isBlank(raw)) continue;
+      if (isBlank(raw)) {
+        stat(field).blankInCsv++;
+        continue;
+      }
 
       if (onlyEmpty && !isBlankFieldValue(offer[field])) {
+        stat(field).alreadyFilled++;
         rowSkippedFilled = true;
         continue;
       }
 
       const value = buildFieldValue(field, raw);
       if (value === null) {
+        stat(field).invalid++;
         rowInvalid = true;
         continue;
       }
-      if (valuesEqual(offer[field], value)) continue;
+      if (valuesEqual(offer[field], value)) {
+        stat(field).identical++;
+        continue;
+      }
 
+      stat(field).toFill++;
       data[field] = value;
     }
 
@@ -317,12 +349,20 @@ export function planOfferUpdates(input: UpdatePlanInput): UpdatePlan {
       let customChanged = false;
       for (const [name, column] of mappedCustom) {
         const raw = row[column];
-        if (isBlank(raw)) continue;
+        if (isBlank(raw)) {
+          stat(name).blankInCsv++;
+          continue;
+        }
         if (onlyEmpty && !isBlank(customValues[name])) {
+          stat(name).alreadyFilled++;
           rowSkippedFilled = true;
           continue;
         }
-        if (String(customValues[name] ?? "") === String(raw)) continue;
+        if (String(customValues[name] ?? "") === String(raw)) {
+          stat(name).identical++;
+          continue;
+        }
+        stat(name).toFill++;
         customValues[name] = raw;
         customChanged = true;
       }
@@ -355,6 +395,7 @@ export function planOfferUpdates(input: UpdatePlanInput): UpdatePlan {
       missingId,
       duplicateId,
       samples,
+      fieldStats,
     },
   };
 }
