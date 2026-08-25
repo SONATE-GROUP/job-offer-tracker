@@ -893,10 +893,27 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                             )}
                           />
                           {offer.url && (
-                            <a href={offer.url} target="_blank" rel="noopener noreferrer"
+                            <a
+                              href={offer.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               title="Ouvrir l'offre"
-                              className="text-xs text-brand-dark underline hover:text-brand-pink shrink-0">
-                              Voir
+                              aria-label="Ouvrir l'offre"
+                              className="text-gray-400 hover:text-brand-pink shrink-0 leading-none"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="w-3.5 h-3.5"
+                              >
+                                <path d="M7 17 17 7" />
+                                <path d="M8 7h9v9" />
+                              </svg>
                             </a>
                           )}
                         </div>
