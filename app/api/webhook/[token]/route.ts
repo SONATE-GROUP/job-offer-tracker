@@ -141,7 +141,7 @@ export async function POST(
           linkedinPage: identity.linkedinPage,
           website: identity.website,
           phone: sanitizeString(lead.company_phone, 50),
-          headquarters: sanitizeString(lead.hq_location, 500),
+          headquarters: identity.headquarters,
           offerLocation: sanitizeString(lead.job_offer_location, 500),
           source: sanitizeString(lead.job_offer_source, 200),
           publishedAt: lead.job_creation_date
