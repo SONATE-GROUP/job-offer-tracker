@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { cn } from "@/lib/cn";
 import { AddCustomFieldModal } from "@/components/forms/add-custom-field-modal";
 import { EditCustomFieldPromptModal } from "@/components/forms/edit-custom-field-prompt-modal";
 import { ImportCsvModal } from "@/components/forms/import-csv-modal";
+import { FILTER_GROUPS, FILTER_PARAM_PREFIX, OFFER_FILTERS, countActiveFilters } from "@/lib/offer-filters";
 
 interface CustomField {
   id: string;
@@ -176,12 +177,17 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
   const [sortBy, setSortBy] = useState("receivedAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [filterStatuses, setFilterStatuses] = useState<Set<string>>(new Set());
+  // Valeurs des filtres du panneau, indexées par nom de paramètre (f_*).
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({});
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [sources, setSources] = useState<string[]>([]);
 
   // Column visibility & widths — loaded from localStorage on mount
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   const [colWidths, setColWidths] = useState<Record<string, number>>({});
   const [showColumnMenu, setShowColumnMenu] = useState(false);
   const columnMenuRef = useRef<HTMLDivElement>(null);
+  const filterPanelRef = useRef<HTMLDivElement>(null);
 
   const LIMIT = 50;
 
@@ -222,6 +228,37 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     return () => document.removeEventListener("mousedown", handler);
   }, [showColumnMenu]);
 
+  useEffect(() => {
+    if (!showFilterPanel) return;
+    const handler = (e: MouseEvent) => {
+      if (filterPanelRef.current && !filterPanelRef.current.contains(e.target as Node)) {
+        setShowFilterPanel(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showFilterPanel]);
+
+  // L'identité de `filterValues` ne change qu'au setState, la clé du fetch est
+  // donc stable entre deux rendus.
+  const activeFilterParams = useMemo(
+    () => Object.fromEntries(
+      Object.entries(filterValues).filter(([, value]) => value != null && value.trim() !== "")
+    ),
+    [filterValues]
+  );
+  const activeFilterCount = countActiveFilters(filterValues);
+
+  function setFilter(param: string, value: string) {
+    setFilterValues((prev) => {
+      const next = { ...prev };
+      if (value.trim() === "") delete next[param];
+      else next[param] = value;
+      return next;
+    });
+    setPage(1);
+  }
+
   const fetchOffers = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
     if (!silent) setLoading(true);
     try {
@@ -233,6 +270,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
         ...(search ? { search } : {}),
         ...(filterStatuses.size > 0 ? { filterStatus: [...filterStatuses].join(",") } : {}),
         ...(targetWorkspaceId ? { targetWorkspaceId } : {}),
+        ...activeFilterParams,
       });
       const res = await fetch(`/api/job-offers?${params}`);
       if (!res.ok) throw new Error(`Erreur ${res.status}`);
@@ -240,6 +278,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
       setOffers(json.data ?? []);
       setTotal(json.total ?? 0);
       setStats(json.stats ?? null);
+      setSources(json.sources ?? []);
     } catch {
       if (!silent) {
         setOffers([]);
@@ -248,7 +287,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [page, search, sortBy, sortDir, filterStatuses, targetWorkspaceId]);
+  }, [page, search, sortBy, sortDir, filterStatuses, targetWorkspaceId, activeFilterParams]);
 
   useEffect(() => {
     fetchOffers();
@@ -484,6 +523,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
       ...(search ? { search } : {}),
       ...(filterStatuses.size > 0 ? { filterStatus: [...filterStatuses].join(",") } : {}),
       ...(targetWorkspaceId ? { targetWorkspaceId } : {}),
+      ...activeFilterParams,
     });
     window.open(`/api/job-offers?${params}`, "_blank");
   }
@@ -619,6 +659,119 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           <span className="text-sm text-gray-500">
             {total} offre{total > 1 ? "s" : ""}
           </span>
+
+          {/* Panneau de filtres */}
+          <div className="relative" ref={filterPanelRef}>
+            <button
+              onClick={() => setShowFilterPanel((v) => !v)}
+              className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1.5 transition-colors"
+            >
+              <span>⌕</span> Filtres
+              {activeFilterCount > 0 && (
+                <span className="bg-brand-pink text-brand-dark text-xs w-4 h-4 flex items-center justify-center font-medium">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
+            {showFilterPanel && (
+              <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 shadow-lg p-4 z-20 w-[460px] max-h-[70vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Filtrer les offres
+                  </p>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={() => { setFilterValues({}); setPage(1); }}
+                      className="text-xs text-gray-500 hover:text-brand-dark underline"
+                    >
+                      Effacer les {activeFilterCount} filtre{activeFilterCount > 1 ? "s" : ""}
+                    </button>
+                  )}
+                </div>
+
+                {FILTER_GROUPS.map((group) => {
+                  const groupFilters = OFFER_FILTERS.filter((f) => f.group === group);
+                  if (groupFilters.length === 0) return null;
+                  return (
+                    <div key={group} className="mb-4 last:mb-0">
+                      <h4 className="text-xs font-semibold text-brand-dark mb-2">{group}</h4>
+                      <div className="space-y-1.5">
+                        {groupFilters.map((filter) => {
+                          const param = `${FILTER_PARAM_PREFIX}${filter.field}`;
+                          return (
+                            <div key={filter.field} className="grid grid-cols-[150px_1fr] gap-2 items-center text-sm">
+                              <span className="text-gray-600 truncate" title={filter.label}>{filter.label}</span>
+
+                              {filter.type === "boolean" && (
+                                <ChoiceRow
+                                  value={filterValues[param] ?? ""}
+                                  onChange={(v) => setFilter(param, v)}
+                                  options={[{ value: "", label: "Tous" }, { value: "yes", label: "Oui" }, { value: "no", label: "Non" }]}
+                                />
+                              )}
+
+                              {filter.type === "presence" && (
+                                <ChoiceRow
+                                  value={filterValues[param] ?? ""}
+                                  onChange={(v) => setFilter(param, v)}
+                                  options={[{ value: "", label: "Tous" }, { value: "empty", label: "Vide" }, { value: "filled", label: "Rempli" }]}
+                                />
+                              )}
+
+                              {filter.type === "text" && (
+                                <input
+                                  type="text"
+                                  defaultValue={filterValues[param] ?? ""}
+                                  onBlur={(e) => setFilter(param, e.target.value)}
+                                  onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+                                  placeholder="contient…"
+                                  className="border border-gray-300 px-2 py-1 text-sm text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                                />
+                              )}
+
+                              {filter.type === "enum" && (
+                                <select
+                                  value={filterValues[param] ?? ""}
+                                  onChange={(e) => setFilter(param, e.target.value)}
+                                  className="border border-gray-300 px-2 py-1 text-sm text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                                >
+                                  <option value="">Toutes</option>
+                                  {sources.map((source) => (
+                                    <option key={source} value={source}>{source}</option>
+                                  ))}
+                                </select>
+                              )}
+
+                              {filter.type === "date" && (
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="date"
+                                    value={filterValues[`${param}_from`] ?? ""}
+                                    onChange={(e) => setFilter(`${param}_from`, e.target.value)}
+                                    aria-label={`${filter.label} — à partir du`}
+                                    className="border border-gray-300 px-1.5 py-1 text-xs text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink w-full"
+                                  />
+                                  <span className="text-xs text-gray-400 shrink-0">au</span>
+                                  <input
+                                    type="date"
+                                    value={filterValues[`${param}_to`] ?? ""}
+                                    onChange={(e) => setFilter(`${param}_to`, e.target.value)}
+                                    aria-label={`${filter.label} — jusqu'au`}
+                                    className="border border-gray-300 px-1.5 py-1 text-xs text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink w-full"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Column visibility menu */}
           <div className="relative" ref={columnMenuRef}>
@@ -1673,5 +1826,37 @@ function CustomFieldCell({
       onBlur={(e) => onChange(e.target.value || null)}
       className="border border-gray-300 px-2 py-1 text-sm w-full text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-pink"
     />
+  );
+}
+
+/** Choix exclusif compact, façon segmented control. */
+function ChoiceRow({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="flex">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          aria-pressed={value === option.value}
+          className={cn(
+            "px-2 py-1 text-xs border -ml-px first:ml-0 transition-colors",
+            value === option.value
+              ? "border-brand-pink bg-brand-pink text-brand-dark font-medium z-10"
+              : "border-gray-300 text-gray-600 hover:bg-gray-50"
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
   );
 }
