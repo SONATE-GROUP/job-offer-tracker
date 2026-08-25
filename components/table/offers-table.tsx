@@ -131,10 +131,15 @@ function normalizeCivility(civility: string | null | undefined): string | null {
   return civility;
 }
 
-function stickyBg(offer: JobOffer): string {
-  if (offer.doNotContact) return "#fef2f2"; // red-50 opaque
-  if (offer.toContact) return "#e9f8ec"; // brand-green/10 over white, opaque
-  return "#ffffff";
+/**
+ * Fond des colonnes figées. Elles doivent être opaques pour masquer le contenu
+ * qui défile dessous, et suivre le survol de la ligne — d'où des classes plutôt
+ * qu'un style inline, qu'aucun `:hover` ne peut surcharger.
+ */
+function stickyBgClass(offer: JobOffer): string {
+  if (offer.doNotContact) return "bg-[#fef2f2] group-hover:bg-[#fde3e3]";
+  if (offer.toContact) return "bg-[#e9f8ec] group-hover:bg-[#d8f1de]";
+  return "bg-white group-hover:bg-gray-50";
 }
 
 function evalFormula(formula: string, offer: JobOffer): string {
@@ -799,16 +804,22 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                   <tr
                     key={offer.id}
                     className={cn(
-                      "group border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer",
-                      offer.toContact && "bg-[#26B743]/10",
-                      offer.doNotContact && "bg-red-50"
+                      "group border-b border-gray-100 transition-colors cursor-pointer",
+                      // Au survol on assombrit la couleur de statut au lieu de la
+                      // remplacer : la ligne reste lisible comme « à contacter »
+                      // ou « ne pas contacter » pendant qu'on la pointe.
+                      offer.doNotContact
+                        ? "bg-red-50 hover:bg-red-100"
+                        : offer.toContact
+                          ? "bg-[#26B743]/10 hover:bg-[#26B743]/20"
+                          : "hover:bg-gray-50"
                     )}
                     onClick={() => setExpandedRow(expandedRow === offer.id ? null : offer.id)}
                   >
                     {/* Delete button */}
                     <td
-                      className="px-1 py-3 text-center"
-                      style={{ position: "sticky", left: 0, zIndex: 2, background: stickyBg(offer) }}
+                      className={cn("px-1 py-3 text-center transition-colors", stickyBgClass(offer))}
+                      style={{ position: "sticky", left: 0, zIndex: 2 }}
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
@@ -823,8 +834,8 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {/* toContact — audience dropdown (sticky) */}
                     {!hiddenColumns.has("toContact") && (
                       <td
-                        className="px-3 py-3"
-                        style={{ position: "sticky", left: 36, zIndex: 2, background: stickyBg(offer) }}
+                        className={cn("px-3 py-3 transition-colors", stickyBgClass(offer))}
+                        style={{ position: "sticky", left: 36, zIndex: 2 }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <AudienceDropdownCell
