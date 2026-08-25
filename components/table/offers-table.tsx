@@ -437,11 +437,15 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     if (res.ok) setCustomFields((prev) => prev.filter((f) => f.id !== fieldId));
   }
 
-  async function handleCsvImported(count: number) {
+  async function handleCsvImported(count: number, mode: "create" | "update") {
     setShowImportCsv(false);
     setPage(1);
     await fetchOffers({ silent: true });
-    alert(`${count} ligne${count > 1 ? "s" : ""} importée${count > 1 ? "s" : ""}.`);
+    alert(
+      mode === "update"
+        ? `${count} offre${count > 1 ? "s" : ""} mise${count > 1 ? "s" : ""} à jour.`
+        : `${count} ligne${count > 1 ? "s" : ""} importée${count > 1 ? "s" : ""}.`
+    );
   }
 
   async function syncLgmStats() {
@@ -1374,7 +1378,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           workspaceId={targetWorkspaceId}
           customFields={customFields}
           onClose={() => setShowImportCsv(false)}
-          onImported={(count) => { void handleCsvImported(count); }}
+          onImported={(count, mode) => { void handleCsvImported(count, mode); }}
         />
       )}
 
