@@ -14,6 +14,7 @@ import {
   type CsvRow,
   type FieldMapping,
 } from "@/lib/csv-import";
+import { normalizeUrl } from "@/lib/url";
 
 const MAX_IMPORT_ROWS = 2_000;
 
@@ -89,6 +90,26 @@ export async function POST(req: NextRequest) {
     };
   });
 
-  const result = await prisma.jobOffer.createMany({ data });
-  return NextResponse.json({ imported: result.count });
+  const existingUrlOffers = await prisma.jobOffer.findMany({
+    where: { workspaceId, url: { not: null } },
+    select: { url: true },
+  });
+  const seenUrls = new Set(existingUrlOffers.map((offer) => normalizeUrl(offer.url as string)));
+
+  let skippedDuplicates = 0;
+  const dataToImport = data.filter((row) => {
+    if (!row.url) return true;
+    const normalized = normalizeUrl(row.url);
+    if (seenUrls.has(normalized)) {
+      skippedDuplicates++;
+      return false;
+    }
+    seenUrls.add(normalized);
+    return true;
+  });
+
+  const result = dataToImport.length > 0
+    ? await prisma.jobOffer.createMany({ data: dataToImport })
+    : { count: 0 };
+  return NextResponse.json({ imported: result.count, skippedDuplicates });
 }
