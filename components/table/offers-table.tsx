@@ -510,14 +510,17 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     if (res.ok) setCustomFields((prev) => prev.filter((f) => f.id !== fieldId));
   }
 
-  async function handleCsvImported(count: number, mode: "create" | "update") {
+  async function handleCsvImported(count: number, mode: "create" | "update", skippedDuplicates = 0) {
     setShowImportCsv(false);
     setPage(1);
     await fetchOffers({ silent: true });
+    const skippedMessage = skippedDuplicates > 0
+      ? ` ${skippedDuplicates} ligne${skippedDuplicates > 1 ? "s" : ""} ignorée${skippedDuplicates > 1 ? "s" : ""} (URL déjà présente dans le tableau).`
+      : "";
     alert(
-      mode === "update"
+      (mode === "update"
         ? `${count} offre${count > 1 ? "s" : ""} mise${count > 1 ? "s" : ""} à jour.`
-        : `${count} ligne${count > 1 ? "s" : ""} importée${count > 1 ? "s" : ""}.`
+        : `${count} ligne${count > 1 ? "s" : ""} importée${count > 1 ? "s" : ""}.`) + skippedMessage
     );
   }
 

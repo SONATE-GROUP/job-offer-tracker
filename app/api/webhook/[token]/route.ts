@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { callAIProvider } from "@/lib/ai-generate";
 import { normalizeLinkedinUrl } from "@/lib/linkedin";
 import { resolveCompanyIdentity } from "@/lib/company-identity";
+import { normalizeUrl } from "@/lib/url";
 
 // Simple in-memory rate limiter: max 60 requests per minute per token
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -105,61 +106,77 @@ export async function POST(
 
   const defaultRecruitingAgency = isRecruitingAgencySearch(body.search_name);
 
-  const created = await Promise.all(
-    leads.map(async (lead: Record<string, unknown>) => {
-      const leadLinkedin = sanitizeUrl(lead.lead_linkedin);
-      const recruitingAgency =
-        "search_name" in lead ? isRecruitingAgencySearch(lead.search_name) : defaultRecruitingAgency;
-      const identity = resolveCompanyIdentity(lead, recruitingAgency, { sanitizeString, sanitizeUrl });
+  // Offres déjà en base avec une URL : sert à ignorer les leads dont l'offre
+  // a déjà été importée, plutôt que de créer un doublon.
+  const existingUrlOffers = await prisma.jobOffer.findMany({
+    where: { workspaceId: workspace.id, url: { not: null } },
+    select: { url: true },
+  });
+  const seenUrls = new Set(existingUrlOffers.map((o) => normalizeUrl(o.url as string)));
 
-      let duplicateWarning: string | null = null;
-      if (leadLinkedin) {
-        const normalized = normalizeLinkedinUrl(leadLinkedin);
-        // SQLite doesn't support case-insensitive URL comparison, so filter in JS
-        const existingOffers = await prisma.jobOffer.findMany({
-          where: { workspaceId: workspace.id, leadLinkedin: { not: null } },
-          select: { toContact: true, contactedAt: true, doNotContact: true, leadLinkedin: true },
-        });
-        const match = existingOffers.find(
-          (o) => o.leadLinkedin && normalizeLinkedinUrl(o.leadLinkedin) === normalized
-        );
-        if (match) {
-          if (match.doNotContact) duplicateWarning = "do_not_contact";
-          else if (match.toContact || match.contactedAt) duplicateWarning = "contacted";
-          else duplicateWarning = "imported";
-        }
-      }
+  const created: Awaited<ReturnType<typeof prisma.jobOffer.create>>[] = [];
 
-      return prisma.jobOffer.create({
-        data: {
-          workspaceId: workspace.id,
-          title: sanitizeString(lead.job_offer_title) ?? "Sans titre",
-          description: sanitizeString(lead.job_offer_description, 10000),
-          url: sanitizeUrl(lead.job_offer_url),
-          company: identity.company ?? "Inconnu",
-          agencyName: identity.agencyName,
-          linkedinPage: identity.linkedinPage,
-          website: identity.website,
-          phone: sanitizeString(lead.company_phone, 50),
-          headquarters: identity.headquarters,
-          offerLocation: sanitizeString(lead.job_offer_location, 500),
-          source: sanitizeString(lead.job_offer_source, 200),
-          publishedAt: lead.job_creation_date
-            ? new Date(String(lead.job_creation_date))
-            : null,
-          leadCivility: normalizeCivility(lead.lead_civility),
-          leadFirstName: toPersonNameCase(lead.lead_first_name),
-          leadLastName: toPersonNameCase(lead.lead_last_name),
-          leadEmail: sanitizeString(lead.lead_email, 254),
-          leadJobTitle: sanitizeString(lead.lead_job_title, 200),
-          leadLinkedin,
-          leadPhone: sanitizeString(lead.lead_phones, 50),
-          recruitingAgency,
-          duplicateWarning,
-        },
+  for (const lead of leads) {
+    const offerUrl = sanitizeUrl(lead.job_offer_url);
+    if (offerUrl) {
+      const normalizedOfferUrl = normalizeUrl(offerUrl);
+      if (seenUrls.has(normalizedOfferUrl)) continue; // offre déjà importée, on ignore ce lead
+      seenUrls.add(normalizedOfferUrl);
+    }
+
+    const leadLinkedin = sanitizeUrl(lead.lead_linkedin);
+    const recruitingAgency =
+      "search_name" in lead ? isRecruitingAgencySearch(lead.search_name) : defaultRecruitingAgency;
+    const identity = resolveCompanyIdentity(lead, recruitingAgency, { sanitizeString, sanitizeUrl });
+
+    let duplicateWarning: string | null = null;
+    if (leadLinkedin) {
+      const normalized = normalizeLinkedinUrl(leadLinkedin);
+      // SQLite doesn't support case-insensitive URL comparison, so filter in JS
+      const existingOffers = await prisma.jobOffer.findMany({
+        where: { workspaceId: workspace.id, leadLinkedin: { not: null } },
+        select: { toContact: true, contactedAt: true, doNotContact: true, leadLinkedin: true },
       });
-    })
-  );
+      const match = existingOffers.find(
+        (o) => o.leadLinkedin && normalizeLinkedinUrl(o.leadLinkedin) === normalized
+      );
+      if (match) {
+        if (match.doNotContact) duplicateWarning = "do_not_contact";
+        else if (match.toContact || match.contactedAt) duplicateWarning = "contacted";
+        else duplicateWarning = "imported";
+      }
+    }
+
+    const offer = await prisma.jobOffer.create({
+      data: {
+        workspaceId: workspace.id,
+        title: sanitizeString(lead.job_offer_title) ?? "Sans titre",
+        description: sanitizeString(lead.job_offer_description, 10000),
+        url: offerUrl,
+        company: identity.company ?? "Inconnu",
+        agencyName: identity.agencyName,
+        linkedinPage: identity.linkedinPage,
+        website: identity.website,
+        phone: sanitizeString(lead.company_phone, 50),
+        headquarters: identity.headquarters,
+        offerLocation: sanitizeString(lead.job_offer_location, 500),
+        source: sanitizeString(lead.job_offer_source, 200),
+        publishedAt: lead.job_creation_date
+          ? new Date(String(lead.job_creation_date))
+          : null,
+        leadCivility: normalizeCivility(lead.lead_civility),
+        leadFirstName: toPersonNameCase(lead.lead_first_name),
+        leadLastName: toPersonNameCase(lead.lead_last_name),
+        leadEmail: sanitizeString(lead.lead_email, 254),
+        leadJobTitle: sanitizeString(lead.lead_job_title, 200),
+        leadLinkedin,
+        leadPhone: sanitizeString(lead.lead_phones, 50),
+        recruitingAgency,
+        duplicateWarning,
+      },
+    });
+    created.push(offer);
+  }
 
   // Auto-fill IA : exécuté APRÈS la réponse via after() pour ne pas bloquer le
   // webhook, tout en garantissant que la plateforme ne tue pas le traitement

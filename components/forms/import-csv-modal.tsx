@@ -16,7 +16,7 @@ interface ImportCsvModalProps {
   customFields: CustomField[];
   workspaceId?: string;
   onClose: () => void;
-  onImported: (count: number, mode: ImportMode) => void;
+  onImported: (count: number, mode: ImportMode, skippedDuplicates?: number) => void;
 }
 
 /** Résultat d'une simulation de mise à jour, renvoyé par l'API en mode dryRun. */
@@ -151,7 +151,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
       return;
     }
 
-    onImported(Number(data.imported ?? 0), "create");
+    onImported(Number(data.imported ?? 0), "create", Number(data.skippedDuplicates ?? 0));
   }
 
   async function handleUpdate(dryRun: boolean) {
