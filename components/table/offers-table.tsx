@@ -42,6 +42,7 @@ interface JobOffer {
   recruitingAgency: boolean;
   agencyName: string | null;
   doNotContact: boolean;
+  badContact: boolean;
   contactedAt: string | null;
   lgmSent: boolean;
   lgmSentAt: string | null;
@@ -65,6 +66,7 @@ interface Stats {
   all: number;
   toContact: number;
   doNotContact: number;
+  badContact: number;
   qualify: number;
 }
 
@@ -141,6 +143,7 @@ function normalizeCivility(civility: string | null | undefined): string | null {
  */
 function stickyBgClass(offer: JobOffer): string {
   if (offer.doNotContact) return "bg-[#fef2f2] group-hover:bg-[#fde3e3]";
+  if (offer.badContact) return "bg-[#fff7ed] group-hover:bg-[#ffedd5]";
   if (offer.toContact) return "bg-[#e9f8ec] group-hover:bg-[#d8f1de]";
   return "bg-white group-hover:bg-gray-50";
 }
@@ -301,11 +304,17 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     return () => clearInterval(interval);
   }, [offers, fetchOffers]);
 
-  async function setContactStatus(id: string, status: "qualify" | "contact" | "doNotContact", audience?: string) {
+  async function setContactStatus(id: string, status: "qualify" | "contact" | "doNotContact" | "badContact", audience?: string) {
     const prevOffer = offers.find((o) => o.id === id);
     if (!prevOffer) return;
 
-    const prevStatus = prevOffer.doNotContact ? "doNotContact" : prevOffer.toContact ? "contact" : "qualify";
+    const prevStatus = prevOffer.doNotContact
+      ? "doNotContact"
+      : prevOffer.badContact
+      ? "badContact"
+      : prevOffer.toContact
+      ? "contact"
+      : "qualify";
 
     // Update optimiste immédiat
     setOffers((prev) =>
@@ -315,6 +324,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
               ...o,
               toContact: status === "contact",
               doNotContact: status === "doNotContact",
+              badContact: status === "badContact",
               lgmAudience: status === "contact" ? (audience ?? null) : null,
             }
           : o
@@ -325,6 +335,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
         ...stats,
         toContact: stats.toContact + (status === "contact" ? 1 : 0) - (prevStatus === "contact" ? 1 : 0),
         doNotContact: stats.doNotContact + (status === "doNotContact" ? 1 : 0) - (prevStatus === "doNotContact" ? 1 : 0),
+        badContact: stats.badContact + (status === "badContact" ? 1 : 0) - (prevStatus === "badContact" ? 1 : 0),
         qualify: stats.qualify + (status === "qualify" ? 1 : 0) - (prevStatus === "qualify" ? 1 : 0),
       });
     }
@@ -627,6 +638,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           <StatBadge label="À qualifier" value={stats.qualify} color="gray" />
           <StatBadge label="Contacté" value={stats.toContact} color="green" />
           <StatBadge label="Ne pas contacter" value={stats.doNotContact} color="red" />
+          <StatBadge label="Mauvais contact" value={stats.badContact} color="orange" />
         </div>
       )}
 
@@ -664,6 +676,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
             { key: "qualify", label: "À qualifier" },
             { key: "contact", label: "Contacté" },
             { key: "doNotContact", label: "Ne pas contacter" },
+            { key: "badContact", label: "Mauvais contact" },
           ].map(({ key, label }) => (
             <label key={key} className="flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
               <input
@@ -995,9 +1008,11 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                       // ou « ne pas contacter » pendant qu'on la pointe.
                       offer.doNotContact
                         ? "bg-red-50 hover:bg-red-100"
-                        : offer.toContact
-                          ? "bg-[#26B743]/10 hover:bg-[#26B743]/20"
-                          : "hover:bg-gray-50"
+                        : offer.badContact
+                          ? "bg-orange-50 hover:bg-orange-100"
+                          : offer.toContact
+                            ? "bg-[#26B743]/10 hover:bg-[#26B743]/20"
+                            : "hover:bg-gray-50"
                     )}
                     onClick={() => setExpandedRow(expandedRow === offer.id ? null : offer.id)}
                   >
@@ -1666,12 +1681,14 @@ function DuplicateBadge({ warning }: { warning: string }) {
   );
 }
 
-function StatBadge({ label, value, color }: { label: string; value: number; color: "gray" | "green" | "red" }) {
+function StatBadge({ label, value, color }: { label: string; value: number; color: "gray" | "green" | "red" | "orange" }) {
   const colorClass =
     color === "green"
       ? "bg-[#26B743]/10 text-[#26B743] border-[#26B743]/20"
       : color === "red"
       ? "bg-red-50 text-red-500 border-red-100"
+      : color === "orange"
+      ? "bg-orange-50 text-orange-500 border-orange-100"
       : "bg-gray-100 text-gray-600 border-gray-200";
   return (
     <div className={`flex items-center gap-2 border px-3 py-1.5 text-sm ${colorClass}`}>
@@ -1688,12 +1705,14 @@ function AudienceDropdownCell({
 }: {
   offer: JobOffer;
   campaigns: string[];
-  onSet: (id: string, status: "qualify" | "contact" | "doNotContact", audience?: string) => void;
+  onSet: (id: string, status: "qualify" | "contact" | "doNotContact" | "badContact", audience?: string) => void;
 }) {
   const multipleAudiences = campaigns.length > 1;
 
   const currentValue = offer.doNotContact
     ? "doNotContact"
+    : offer.badContact
+    ? "badContact"
     : offer.toContact
     ? (multipleAudiences && offer.lgmAudience ? offer.lgmAudience : "__contact__")
     : "qualify";
@@ -1703,6 +1722,8 @@ function AudienceDropdownCell({
       onSet(offer.id, "qualify");
     } else if (val === "doNotContact") {
       onSet(offer.id, "doNotContact");
+    } else if (val === "badContact") {
+      onSet(offer.id, "badContact");
     } else if (val === "__contact__") {
       // 1 audience : on l'utilise automatiquement
       onSet(offer.id, "contact", campaigns[0]);
@@ -1720,6 +1741,8 @@ function AudienceDropdownCell({
           "text-xs border px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-pink bg-white",
           offer.doNotContact
             ? "border-red-200 text-red-500"
+            : offer.badContact
+            ? "border-orange-200 text-orange-500"
             : offer.toContact
             ? "border-[#26B743]/30 text-[#26B743]"
             : "border-gray-200 text-gray-500"
@@ -1727,6 +1750,7 @@ function AudienceDropdownCell({
       >
         <option value="qualify">— À qualifier</option>
         <option value="doNotContact">✗ Ne pas contacter</option>
+        <option value="badContact">⚠ Mauvais contact</option>
         {!multipleAudiences && (
           <option value="__contact__">✓ Contacter</option>
         )}

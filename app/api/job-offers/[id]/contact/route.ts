@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { normalizeLinkedinUrl } from "@/lib/linkedin";
 
-type ContactStatus = "qualify" | "contact" | "doNotContact";
+type ContactStatus = "qualify" | "contact" | "doNotContact" | "badContact";
 
 function extractEmeliaCampaignId(value: string): string | null {
   const trimmed = value.trim();
@@ -99,7 +99,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const { status, audience }: { status: ContactStatus; audience?: string } = await req.json();
 
-  if (!["qualify", "contact", "doNotContact"].includes(status)) {
+  if (!["qualify", "contact", "doNotContact", "badContact"].includes(status)) {
     return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
   }
 
@@ -114,6 +114,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     data: {
       toContact: status === "contact",
       doNotContact: status === "doNotContact",
+      badContact: status === "badContact",
       contactedAt: status === "contact" ? new Date() : null,
       lgmAudience: status === "contact" ? (audience ?? null) : null,
     },

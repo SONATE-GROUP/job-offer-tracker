@@ -1,0 +1,1 @@
+ALTER TABLE "JobOffer" ADD COLUMN "badContact" BOOLEAN NOT NULL DEFAULT false;

@@ -46,9 +46,10 @@ export async function GET(req: NextRequest) {
 
   if (activeStatuses.length > 0) {
     const orClauses: Record<string, unknown>[] = [];
-    if (activeStatuses.includes("qualify")) orClauses.push({ toContact: false, doNotContact: false });
+    if (activeStatuses.includes("qualify")) orClauses.push({ toContact: false, doNotContact: false, badContact: false });
     if (activeStatuses.includes("contact")) orClauses.push({ toContact: true });
     if (activeStatuses.includes("doNotContact")) orClauses.push({ doNotContact: true });
+    if (activeStatuses.includes("badContact")) orClauses.push({ badContact: true });
     if (orClauses.length > 0) andClauses.push({ OR: orClauses });
   }
 
@@ -82,9 +83,10 @@ export async function GET(req: NextRequest) {
       // L'id vient en premier : c'est la clé qui permet de réimporter le fichier
       // en mode « mise à jour » pour remplir des colonnes en masse.
       { key: "id", label: "id", value: (o) => o.id },
-      { key: "toContact", label: "Statut contact", value: (o) => (o.doNotContact ? "Ne pas contacter" : o.toContact ? "Contacté" : "À qualifier") },
+      { key: "toContact", label: "Statut contact", value: (o) => (o.doNotContact ? "Ne pas contacter" : o.badContact ? "Mauvais contact" : o.toContact ? "Contacté" : "À qualifier") },
       { key: "toContactRaw", label: "À contacter", value: (o) => (o.toContact ? "Oui" : "Non") },
       { key: "doNotContact", label: "Ne pas contacter", value: (o) => (o.doNotContact ? "Oui" : "Non") },
+      { key: "badContact", label: "Mauvais contact", value: (o) => (o.badContact ? "Oui" : "Non") },
       { key: "recruitingAgency", label: "Cabinet recrutement", value: (o) => (o.recruitingAgency ? "Oui" : "Non") },
       { key: "agencyName", label: "Nom du cabinet", value: (o) => o.agencyName ?? "" },
       { key: "title", label: "Offre d'emploi", value: (o) => o.title },
@@ -156,13 +158,14 @@ export async function GET(req: NextRequest) {
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
   const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 200) : 50;
 
-  const [rawData, total, statsAll, statsToContact, statsDNC, linkedinOffers] = await retryAfterEnsuringRecruitingAgencyColumn(() =>
+  const [rawData, total, statsAll, statsToContact, statsDNC, statsBadContact, linkedinOffers] = await retryAfterEnsuringRecruitingAgencyColumn(() =>
     Promise.all([
       prisma.jobOffer.findMany({ where, orderBy: { [sortBy]: sortDir }, skip: (page - 1) * limit, take: limit }),
       prisma.jobOffer.count({ where }),
       prisma.jobOffer.count({ where: { workspaceId } }),
       prisma.jobOffer.count({ where: { workspaceId, toContact: true } }),
       prisma.jobOffer.count({ where: { workspaceId, doNotContact: true } }),
+      prisma.jobOffer.count({ where: { workspaceId, badContact: true } }),
       // Toutes les offres du workspace ayant un LinkedIn, pour détecter les doublons
       // au-delà de la page courante (la détection front ne voyait que la page chargée).
       prisma.jobOffer.findMany({
@@ -218,7 +221,8 @@ export async function GET(req: NextRequest) {
       all: statsAll,
       toContact: statsToContact,
       doNotContact: statsDNC,
-      qualify: statsAll - statsToContact - statsDNC,
+      badContact: statsBadContact,
+      qualify: statsAll - statsToContact - statsDNC - statsBadContact,
     },
   });
 }
