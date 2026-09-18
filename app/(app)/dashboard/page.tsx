@@ -68,7 +68,7 @@ export default async function DashboardPage({ searchParams }: Props) {
         </div>
       )}
 
-      <OffersTable key={targetWorkspaceId} customFields={customFields} targetWorkspaceId={isAdmin ? targetWorkspaceId : undefined} campaigns={campaigns} />
+      <OffersTable key={targetWorkspaceId} customFields={customFields} targetWorkspaceId={isAdmin ? targetWorkspaceId : undefined} campaigns={campaigns} isAdmin={isAdmin} />
     </div>
   );
 }
