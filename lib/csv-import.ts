@@ -24,6 +24,7 @@ export type JobOfferField =
   | "leadPhone"
   | "toContact"
   | "doNotContact"
+  | "badContact"
   | "recruitingAgency"
   | "agencyName"
   | "callRequested"
@@ -55,6 +56,7 @@ export const UPDATABLE_FIELDS: JobOfferField[] = [
   "leadPhone",
   "toContact",
   "doNotContact",
+  "badContact",
   "recruitingAgency",
   "agencyName",
   "callRequested",
@@ -65,6 +67,7 @@ export const UPDATABLE_FIELDS: JobOfferField[] = [
 const BOOLEAN_FIELDS = new Set<JobOfferField>([
   "toContact",
   "doNotContact",
+  "badContact",
   "recruitingAgency",
   "callRequested",
   "phoneLookupRequested",
@@ -176,6 +179,7 @@ export function buildFieldValue(field: JobOfferField, raw: unknown): string | bo
       return cleanString(raw, 254);
     case "toContact":
     case "doNotContact":
+    case "badContact":
     case "recruitingAgency":
     case "callRequested":
     case "phoneLookupRequested":

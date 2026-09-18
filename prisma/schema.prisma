@@ -125,6 +125,7 @@ model JobOffer {
   // Action
   toContact           Boolean   @default(false)
   doNotContact        Boolean   @default(false)
+  badContact          Boolean   @default(false)
   contactedAt         DateTime?
   lgmSent             Boolean   @default(false)
   lgmSentAt           DateTime?
