@@ -39,6 +39,40 @@ function extractEmeliaErrorMessage(detail: unknown): string | null {
   return String(candidate);
 }
 
+const BAD_CONTACT_NOTIFICATION_EMAIL = "clotilde.mares@sonate.group";
+const DASHBOARD_URL = "https://job-offer-tracker.vercel.app/dashboard";
+
+/** Alerte email quand un lead est marqué « Mauvais contact », pour aller en chercher un autre. */
+async function notifyBadContact(offer: { leadFirstName: string | null; leadLastName: string | null }): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("[Resend] RESEND_API_KEY absente, notification « Mauvais contact » non envoyée.");
+    return;
+  }
+
+  const fullName = [offer.leadFirstName, offer.leadLastName].filter(Boolean).join(" ") || "Contact inconnu";
+  const text = `Mauvais contact : ${fullName}\nIdentifier le bon contact : ${DASHBOARD_URL}`;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        from: "Job Offer Tracker <onboarding@resend.dev>",
+        to: BAD_CONTACT_NOTIFICATION_EMAIL,
+        subject: `Mauvais contact : ${fullName}`,
+        text,
+      }),
+    });
+    if (!res.ok) {
+      const detail = await res.json().catch(() => null);
+      console.error(`[Resend] Erreur HTTP ${res.status}:`, detail);
+    }
+  } catch (err) {
+    console.error("[Resend] Erreur de connexion:", err);
+  }
+}
+
 type EmeliaCampaignInfo = { id: string; provider: string; isAdvanced: boolean } | null;
 
 async function resolveEmeliaCampaign(apiKey: string, nameOrIdOrUrl: string): Promise<EmeliaCampaignInfo> {
@@ -336,6 +370,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (providerError) {
       return NextResponse.json({ error: providerError }, { status: 502 });
     }
+  }
+
+  if (status === "badContact") {
+    await notifyBadContact(offer);
   }
 
   // Cascade duplicateWarning to all offers sharing the same linkedinUrl
