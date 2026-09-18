@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { AddCustomFieldModal } from "@/components/forms/add-custom-field-modal";
 import { EditCustomFieldPromptModal } from "@/components/forms/edit-custom-field-prompt-modal";
 import { ImportCsvModal } from "@/components/forms/import-csv-modal";
+import { AddOfferModal } from "@/components/forms/add-offer-modal";
 import { FILTER_GROUPS, FILTER_PARAM_PREFIX, OFFER_FILTERS, countActiveFilters } from "@/lib/offer-filters";
 
 interface CustomField {
@@ -74,6 +75,7 @@ interface OffersTableProps {
   customFields: CustomField[];
   targetWorkspaceId?: string;
   campaigns: string[];
+  isAdmin?: boolean;
 }
 
 const FIXED_COLUMNS = [
@@ -159,7 +161,7 @@ function evalFormula(formula: string, offer: JobOffer): string {
   });
 }
 
-export function OffersTable({ customFields: initialCustomFields, targetWorkspaceId, campaigns }: OffersTableProps) {
+export function OffersTable({ customFields: initialCustomFields, targetWorkspaceId, campaigns, isAdmin }: OffersTableProps) {
   const [offers, setOffers] = useState<JobOffer[]>([]);
   const [total, setTotal] = useState(0);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -170,6 +172,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
   const [customFields, setCustomFields] = useState<CustomField[]>(initialCustomFields);
   const [showAddField, setShowAddField] = useState(false);
   const [showImportCsv, setShowImportCsv] = useState(false);
+  const [showAddOffer, setShowAddOffer] = useState(false);
   const [editingPromptField, setEditingPromptField] = useState<CustomField | null>(null);
   const [urlError, setUrlError] = useState<Record<string, string>>({});
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
@@ -535,6 +538,12 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
     );
   }
 
+  async function handleOfferAdded() {
+    setShowAddOffer(false);
+    setPage(1);
+    await fetchOffers({ silent: true });
+  }
+
   async function syncLgmStats() {
     setSyncingLgm(true);
     try {
@@ -861,6 +870,16 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
               </div>
             )}
           </div>
+
+          {isAdmin && (
+            <button
+              onClick={() => setShowAddOffer(true)}
+              className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1 transition-colors"
+              title="Ajouter un contact manuellement"
+            >
+              + Ajouter un contact
+            </button>
+          )}
 
           <button
             onClick={() => setShowImportCsv(true)}
@@ -1627,6 +1646,14 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
             Suivant →
           </button>
         </div>
+      )}
+
+      {showAddOffer && (
+        <AddOfferModal
+          workspaceId={targetWorkspaceId}
+          onClose={() => setShowAddOffer(false)}
+          onAdded={() => { void handleOfferAdded(); }}
+        />
       )}
 
       {showImportCsv && (
