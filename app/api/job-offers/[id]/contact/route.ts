@@ -25,6 +25,20 @@ function extractEmeliaCampaignId(value: string): string | null {
   return null;
 }
 
+/** Emelia ne renvoie pas toujours l'erreur sous la même clé selon l'endpoint. */
+function extractEmeliaErrorMessage(detail: unknown): string | null {
+  if (!detail || typeof detail !== "object") return null;
+  const d = detail as Record<string, unknown>;
+  const candidate = d.message ?? d.error ?? d.errors;
+  if (candidate == null) return null;
+  if (Array.isArray(candidate)) {
+    const parts = candidate.map((c) => (c && typeof c === "object" ? (c as Record<string, unknown>).message ?? c : c));
+    return parts.map(String).join(" ; ");
+  }
+  if (typeof candidate === "object") return JSON.stringify(candidate);
+  return String(candidate);
+}
+
 type EmeliaCampaignInfo = { id: string; provider: string; isAdvanced: boolean } | null;
 
 async function resolveEmeliaCampaign(apiKey: string, nameOrIdOrUrl: string): Promise<EmeliaCampaignInfo> {
@@ -189,8 +203,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             } else {
               const detail = await res.json().catch(() => null);
               console.error(`[Emelia Advanced] Erreur HTTP ${res.status}:`, detail);
-              providerError = detail?.message
-                ? `Emelia: ${String(detail.message)}`
+              const detailMessage = extractEmeliaErrorMessage(detail);
+              providerError = detailMessage
+                ? `Emelia: ${detailMessage}`
                 : `Emelia a répondu avec une erreur HTTP ${res.status}.`;
             }
           } else {
@@ -247,8 +262,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             } else {
               const detail = await res.json().catch(() => null);
               console.error(`[Emelia] Erreur HTTP ${res.status}:`, detail);
-              providerError = detail?.message
-                ? `Emelia: ${String(detail.message)}`
+              const detailMessage = extractEmeliaErrorMessage(detail);
+              providerError = detailMessage
+                ? `Emelia: ${detailMessage}`
                 : `Emelia a répondu avec une erreur HTTP ${res.status}.`;
             }
           }
