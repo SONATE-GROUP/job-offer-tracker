@@ -20,9 +20,13 @@ export interface UserAIConfig {
   geminiApiKey: string | null;
   groqApiKey: string | null;
   openaiApiKey: string | null;
+  openrouterApiKey: string | null;
+  openrouterModel: string | null;
 }
 
-type Provider = "claude" | "gemini" | "groq" | "openai";
+export const DEFAULT_OPENROUTER_MODEL = "openai/gpt-4o-mini";
+
+type Provider = "claude" | "gemini" | "groq" | "openai" | "openrouter";
 
 /** Substitue {{field}} dans le prompt avec les valeurs de l'offre */
 function substituteVars(prompt: string, offer: OfferForAI): string {
@@ -85,6 +89,7 @@ export async function callAIProvider(
     gemini: user.geminiApiKey,
     groq: user.groqApiKey,
     openai: user.openaiApiKey,
+    openrouter: user.openrouterApiKey,
   };
 
   const apiKey = keyMap[provider];
@@ -103,6 +108,8 @@ export async function callAIProvider(
       return callGroq(apiKey, fullPrompt);
     case "openai":
       return callOpenAI(apiKey, fullPrompt);
+    case "openrouter":
+      return callOpenRouter(apiKey, user.openrouterModel || DEFAULT_OPENROUTER_MODEL, fullPrompt);
   }
 }
 
@@ -159,6 +166,30 @@ async function callOpenAI(apiKey: string, prompt: string): Promise<string> {
     }),
   });
   if (!res.ok) throw new Error(`OpenAI API error: ${res.status}`);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content?.trim() ?? "";
+}
+
+async function callOpenRouter(apiKey: string, model: string, prompt: string): Promise<string> {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "X-Title": "Job Offer Tracker",
+    },
+    body: JSON.stringify({
+      model,
+      // Marge plus large que les autres fournisseurs : certains modèles
+      // OpenRouter consomment des tokens de raisonnement avant de répondre.
+      max_tokens: 500,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`OpenRouter API error: ${res.status}${detail ? ` ${detail.slice(0, 200)}` : ""}`);
+  }
   const data = await res.json();
   return data.choices?.[0]?.message?.content?.trim() ?? "";
 }
