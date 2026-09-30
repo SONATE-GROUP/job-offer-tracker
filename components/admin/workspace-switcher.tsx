@@ -16,7 +16,7 @@ export function WorkspaceSwitcher({ workspaces, currentWorkspaceId }: { workspac
       <select
         value={currentWorkspaceId}
         onChange={(e) => router.push(`/dashboard?workspaceId=${e.target.value}`)}
-        className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink bg-white"
+        className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange bg-sonate-ivory-light"
       >
         {workspaces.map((workspace) => (
           <option key={workspace.id} value={workspace.id}>

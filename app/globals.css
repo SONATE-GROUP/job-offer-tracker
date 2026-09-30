@@ -1,34 +1,73 @@
 @import "tailwindcss";
 
+/* Charte graphique Sonate Group : ivoire en fond, vert sapin pour la structure,
+   orange en accent rare, Manrope partout. */
 :root {
-  --background: #FAF5ED;
-  --foreground: #232323;
+  --background: #F6F1E8;
+  --foreground: #1F2421;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-brand-pink: #FFBEFA;
-  --color-brand-green: #26B743;
-  --color-brand-dark: #232323;
-  --color-brand-beige: #FAF5ED;
+  --font-sans: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* DA: angles carrés partout */
-  --radius-none: 0;
-  --radius-sm: 0;
-  --radius: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-xl: 0;
-  --radius-2xl: 0;
-  --radius-3xl: 0;
-  --radius-full: 0;
+  /* Palette canonique */
+  --color-sonate-green: #123C33;
+  --color-sonate-orange: #FF6B3D;
+  --color-sonate-ivory: #F6F1E8;
+  --color-sonate-ink: #1F2421;
+
+  /* Dérivées */
+  --color-sonate-cream-border: #E8DFC9;
+  --color-sonate-ink-muted: #6b6f6c;
+  --color-sonate-accent-soft: #FFE3D6;
+
+  /* Teintes web étendues */
+  --color-sonate-green-dark: #0d2a24;
+  --color-sonate-green-mid: #2f7d5b;
+  --color-sonate-green-50: #f3f8f5;
+  --color-sonate-green-100: #e7efe9;
+  --color-sonate-green-border: #cfe0da;
+  --color-sonate-ivory-light: #fcfaf5;
+  --color-sonate-orange-dark: #c2410c;
+  --color-sonate-orange-border: #f4c9b8;
+
+  /* Neutres réchauffés pour s'accorder à l'ivoire (bordures cream, texte ink muted) */
+  --color-gray-50: #fcfaf5;
+  --color-gray-100: #f1ebdf;
+  --color-gray-200: #E8DFC9;
+  --color-gray-300: #ddd3bd;
+  --color-gray-400: #8f928f;
+  --color-gray-500: #6b6f6c;
+  --color-gray-600: #555955;
+  --color-gray-700: #3a3f3c;
+  --color-gray-800: #2a2f2c;
+  --color-gray-900: #1F2421;
+
+  /* Coins arrondis doux, comme dans la charte (6 à 10 px) */
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+
+  /* Ombre signature teintée vert */
+  --shadow-sm: 0 2px 6px rgba(18, 60, 51, 0.10);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+@layer base {
+  button:not([role="checkbox"]),
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    border-radius: var(--radius-md);
+  }
 }

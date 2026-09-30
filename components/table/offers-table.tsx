@@ -145,9 +145,9 @@ function normalizeCivility(civility: string | null | undefined): string | null {
  */
 function stickyBgClass(offer: JobOffer): string {
   if (offer.doNotContact) return "bg-[#fef2f2] group-hover:bg-[#fde3e3]";
-  if (offer.badContact) return "bg-[#fff7ed] group-hover:bg-[#ffedd5]";
-  if (offer.toContact) return "bg-[#e9f8ec] group-hover:bg-[#d8f1de]";
-  return "bg-white group-hover:bg-gray-50";
+  if (offer.badContact) return "bg-[#fff1ea] group-hover:bg-[#FFE3D6]";
+  if (offer.toContact) return "bg-[#e7efe9] group-hover:bg-[#dbe8df]";
+  return "bg-sonate-ivory-light group-hover:bg-gray-50";
 }
 
 function evalFormula(formula: string, offer: JobOffer): string {
@@ -659,11 +659,11 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Rechercher offre, entreprise, lead..."
-            className="border border-gray-300 px-3 py-2 text-sm w-72 text-brand-dark bg-white focus:outline-none focus:ring-2 focus:ring-brand-pink"
+            className="border border-gray-300 px-3 py-2 text-sm w-72 text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-2 focus:ring-sonate-orange"
           />
           <button
             type="submit"
-            className="bg-brand-pink text-brand-dark px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+            className="bg-sonate-green text-sonate-ivory px-4 py-2 text-sm font-medium hover:bg-sonate-green-dark transition-opacity"
           >
             Rechercher
           </button>
@@ -671,7 +671,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
             <button
               type="button"
               onClick={() => { setSearch(""); setSearchInput(""); setPage(1); }}
-              className="text-sm text-gray-500 hover:text-brand-dark px-2"
+              className="text-sm text-gray-500 hover:text-sonate-green px-2"
             >
               ✕
             </button>
@@ -679,7 +679,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
         </form>
 
         {/* Filter: multi-select statuses */}
-        <div className="flex items-center gap-3 border border-gray-300 px-3 py-2 bg-white text-sm text-brand-dark">
+        <div className="flex items-center gap-3 border border-gray-300 px-3 py-2 bg-sonate-ivory-light text-sm text-sonate-ink">
           <span className="text-gray-500 shrink-0">Filtre :</span>
           {[
             { key: "qualify", label: "À qualifier" },
@@ -699,7 +699,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                   });
                   setPage(1);
                 }}
-                style={{ accentColor: "#FFBEFA" }}
+                style={{ accentColor: "#123C33" }}
                 className="w-3.5 h-3.5"
               />
               <span>{label}</span>
@@ -716,18 +716,18 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           <div className="relative" ref={filterPanelRef}>
             <button
               onClick={() => setShowFilterPanel((v) => !v)}
-              className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1.5 transition-colors"
+              className="text-sm border border-gray-300 px-3 py-2 hover:bg-sonate-ivory-light text-sonate-ink flex items-center gap-1.5 transition-colors"
             >
               <span>⌕</span> Filtres
               {activeFilterCount > 0 && (
-                <span className="bg-brand-pink text-brand-dark text-xs w-4 h-4 flex items-center justify-center font-medium">
+                <span className="bg-sonate-green text-sonate-ivory text-xs w-4 h-4 flex items-center justify-center font-medium">
                   {activeFilterCount}
                 </span>
               )}
             </button>
 
             {showFilterPanel && (
-              <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 shadow-lg p-4 z-20 w-[460px] max-h-[70vh] overflow-y-auto">
+              <div className="absolute right-0 top-full mt-1 bg-sonate-ivory-light border border-gray-200 shadow-lg p-4 z-20 w-[460px] max-h-[70vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                     Filtrer les offres
@@ -735,7 +735,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                   {activeFilterCount > 0 && (
                     <button
                       onClick={() => { setFilterValues({}); setPage(1); }}
-                      className="text-xs text-gray-500 hover:text-brand-dark underline"
+                      className="text-xs text-gray-500 hover:text-sonate-green underline"
                     >
                       Effacer les {activeFilterCount} filtre{activeFilterCount > 1 ? "s" : ""}
                     </button>
@@ -747,7 +747,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                   if (groupFilters.length === 0) return null;
                   return (
                     <div key={group} className="mb-4 last:mb-0">
-                      <h4 className="text-xs font-semibold text-brand-dark mb-2">{group}</h4>
+                      <h4 className="text-xs font-semibold text-sonate-green mb-2">{group}</h4>
                       <div className="space-y-1.5">
                         {groupFilters.map((filter) => {
                           const param = `${FILTER_PARAM_PREFIX}${filter.field}`;
@@ -778,7 +778,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                                   onBlur={(e) => setFilter(param, e.target.value)}
                                   onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
                                   placeholder="contient…"
-                                  className="border border-gray-300 px-2 py-1 text-sm text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                                  className="border border-gray-300 px-2 py-1 text-sm text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-1 focus:ring-sonate-orange"
                                 />
                               )}
 
@@ -786,7 +786,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                                 <select
                                   value={filterValues[param] ?? ""}
                                   onChange={(e) => setFilter(param, e.target.value)}
-                                  className="border border-gray-300 px-2 py-1 text-sm text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                                  className="border border-gray-300 px-2 py-1 text-sm text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-1 focus:ring-sonate-orange"
                                 >
                                   <option value="">Toutes</option>
                                   {sources.map((source) => (
@@ -802,7 +802,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                                     value={filterValues[`${param}_from`] ?? ""}
                                     onChange={(e) => setFilter(`${param}_from`, e.target.value)}
                                     aria-label={`${filter.label} — à partir du`}
-                                    className="border border-gray-300 px-1.5 py-1 text-xs text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink w-full"
+                                    className="border border-gray-300 px-1.5 py-1 text-xs text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-1 focus:ring-sonate-orange w-full"
                                   />
                                   <span className="text-xs text-gray-400 shrink-0">au</span>
                                   <input
@@ -810,7 +810,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                                     value={filterValues[`${param}_to`] ?? ""}
                                     onChange={(e) => setFilter(`${param}_to`, e.target.value)}
                                     aria-label={`${filter.label} — jusqu'au`}
-                                    className="border border-gray-300 px-1.5 py-1 text-xs text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink w-full"
+                                    className="border border-gray-300 px-1.5 py-1 text-xs text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-1 focus:ring-sonate-orange w-full"
                                   />
                                 </div>
                               )}
@@ -829,18 +829,18 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           <div className="relative" ref={columnMenuRef}>
             <button
               onClick={() => setShowColumnMenu((v) => !v)}
-              className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1.5 transition-colors"
+              className="text-sm border border-gray-300 px-3 py-2 hover:bg-sonate-ivory-light text-sonate-ink flex items-center gap-1.5 transition-colors"
             >
               <span>⊞</span> Colonnes
               {hiddenColumns.size > 0 && (
-                <span className="bg-brand-pink text-brand-dark text-xs w-4 h-4 flex items-center justify-center font-medium">
+                <span className="bg-sonate-green text-sonate-ivory text-xs w-4 h-4 flex items-center justify-center font-medium">
                   {hiddenColumns.size}
                 </span>
               )}
             </button>
 
             {showColumnMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 shadow-lg p-3 z-20 min-w-[210px]">
+              <div className="absolute right-0 top-full mt-1 bg-sonate-ivory-light border border-gray-200 shadow-lg p-3 z-20 min-w-[210px]">
                 <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">
                   Afficher / masquer
                 </p>
@@ -853,16 +853,16 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                       type="checkbox"
                       checked={!hiddenColumns.has(col.key)}
                       onChange={() => toggleColumn(col.key)}
-                      style={{ accentColor: "#FFBEFA" }}
+                      style={{ accentColor: "#123C33" }}
                       className="w-3.5 h-3.5"
                     />
-                    <span className="text-sm text-brand-dark">{col.label}</span>
+                    <span className="text-sm text-sonate-ink">{col.label}</span>
                   </label>
                 ))}
                 {hiddenColumns.size > 0 && (
                   <button
                     onClick={() => setHiddenColumns(new Set())}
-                    className="mt-2 w-full text-xs text-gray-500 hover:text-brand-dark text-left px-1"
+                    className="mt-2 w-full text-xs text-gray-500 hover:text-sonate-green text-left px-1"
                   >
                     Tout afficher
                   </button>
@@ -874,7 +874,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           {isAdmin && (
             <button
               onClick={() => setShowAddOffer(true)}
-              className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1 transition-colors"
+              className="text-sm border border-gray-300 px-3 py-2 hover:bg-sonate-ivory-light text-sonate-ink flex items-center gap-1 transition-colors"
               title="Ajouter un contact manuellement"
             >
               + Ajouter un contact
@@ -883,7 +883,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
 
           <button
             onClick={() => setShowImportCsv(true)}
-            className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1 transition-colors"
+            className="text-sm border border-gray-300 px-3 py-2 hover:bg-sonate-ivory-light text-sonate-ink flex items-center gap-1 transition-colors"
             title="Importer des offres depuis un fichier CSV"
           >
             ↑ Import CSV
@@ -891,7 +891,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
 
           <button
             onClick={() => setShowAddField(true)}
-            className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1 transition-colors"
+            className="text-sm border border-gray-300 px-3 py-2 hover:bg-sonate-ivory-light text-sonate-ink flex items-center gap-1 transition-colors"
           >
             + Champ personnalisé
           </button>
@@ -899,7 +899,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           <button
             onClick={() => void syncLgmStats()}
             disabled={syncingLgm}
-            className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1 transition-colors disabled:opacity-50"
+            className="text-sm border border-gray-300 px-3 py-2 hover:bg-sonate-ivory-light text-sonate-ink flex items-center gap-1 transition-colors disabled:opacity-50"
             title="Synchroniser les stats LGM (messages envoyés, ouvertures)"
           >
             {syncingLgm ? "Synchro…" : "↻ Stats LGM"}
@@ -907,7 +907,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
 
           <button
             onClick={handleExportCsv}
-            className="text-sm border border-gray-300 px-3 py-2 hover:bg-white text-brand-dark flex items-center gap-1 transition-colors"
+            className="text-sm border border-gray-300 px-3 py-2 hover:bg-sonate-ivory-light text-sonate-ink flex items-center gap-1 transition-colors"
             title="Exporter le tableau en CSV"
           >
             ↓ Export CSV
@@ -916,16 +916,16 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-x-auto border border-gray-200 bg-sonate-ivory-light shadow-sm">
         <table
           className="text-sm border-collapse"
           style={{ tableLayout: "fixed", width: "max-content", minWidth: "100%" }}
         >
           <thead>
-            <tr className="bg-brand-dark border-b border-gray-800">
+            <tr className="bg-sonate-green border-b border-sonate-green-dark">
               {/* delete placeholder col */}
               <th
-                style={{ width: 36, position: "sticky", left: 0, zIndex: 3, background: "#232323" }}
+                style={{ width: 36, position: "sticky", left: 0, zIndex: 3, background: "#123C33" }}
                 className="px-1 py-3"
               />
               {visibleFixed.map((col) => {
@@ -940,14 +940,14 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                       position: isSticky ? "sticky" : "relative",
                       left: isSticky ? 36 : undefined,
                       zIndex: isSticky ? 3 : undefined,
-                      background: isSticky ? "#232323" : undefined,
+                      background: isSticky ? "#123C33" : undefined,
                     }}
-                    className="text-left px-3 py-3 font-medium text-white whitespace-nowrap select-none"
+                    className="text-left px-3 py-3 font-medium text-sonate-ivory whitespace-nowrap select-none"
                   >
                     {sortable ? (
                       <button
                         onClick={() => handleSort(col.key)}
-                        className="flex items-center gap-1 hover:text-brand-pink transition-colors"
+                        className="flex items-center gap-1 hover:text-sonate-orange transition-colors"
                       >
                         {col.label}
                         <span className="text-xs opacity-60">
@@ -959,7 +959,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     )}
                     <div
                       onMouseDown={(e) => handleResizeMouseDown(e, col.key)}
-                      className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize hover:bg-brand-pink/60 transition-colors"
+                      className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize hover:bg-sonate-orange/60 transition-colors"
                     />
                   </th>
                 );
@@ -971,7 +971,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     width: getColWidth(field.id, CUSTOM_FIELD_DEFAULT_WIDTH),
                     position: "relative",
                   }}
-                  className="text-left px-3 py-3 font-medium text-white whitespace-nowrap select-none"
+                  className="text-left px-3 py-3 font-medium text-sonate-ivory whitespace-nowrap select-none"
                 >
                   <span className="flex items-center gap-1 pr-3">
                     {field.type === "AI" && <span title="Champ IA">⚡</span>}
@@ -980,7 +980,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {(field.type === "AI" || field.type === "FORMULA") && (
                       <button
                         onClick={() => setEditingPromptField(field)}
-                        className="text-white/30 hover:text-white ml-1 text-xs"
+                        className="text-sonate-ivory/30 hover:text-sonate-ivory ml-1 text-xs"
                         title={field.type === "AI" ? "Modifier le prompt IA" : "Modifier la formule"}
                       >
                         ✎
@@ -988,7 +988,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     )}
                     <button
                       onClick={() => deleteCustomField(field.id)}
-                      className="text-white/30 hover:text-red-400 ml-1 text-xs"
+                      className="text-sonate-ivory/30 hover:text-red-400 ml-1 text-xs"
                       title="Supprimer ce champ"
                     >
                       ✕
@@ -996,7 +996,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                   </span>
                   <div
                     onMouseDown={(e) => handleResizeMouseDown(e, field.id)}
-                    className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize hover:bg-brand-pink/60 transition-colors"
+                    className="absolute right-0 top-0 h-full w-1.5 cursor-col-resize hover:bg-sonate-orange/60 transition-colors"
                   />
                 </th>
               ))}
@@ -1030,7 +1030,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                         : offer.badContact
                           ? "bg-orange-50 hover:bg-orange-100"
                           : offer.toContact
-                            ? "bg-[#26B743]/10 hover:bg-[#26B743]/20"
+                            ? "bg-[#2f7d5b]/10 hover:bg-[#2f7d5b]/20"
                             : "hover:bg-gray-50"
                     )}
                     onClick={() => setExpandedRow(expandedRow === offer.id ? null : offer.id)}
@@ -1075,7 +1075,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                             void updateRecruitingAgency(offer.id, e.target.checked);
                           }}
                           className="w-4 h-4 cursor-pointer"
-                          style={{ accentColor: "#FFBEFA" }}
+                          style={{ accentColor: "#123C33" }}
                         />
                       </td>
                     )}
@@ -1097,7 +1097,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                             }}
                             placeholder="—"
                             title={offer.agencyName ?? undefined}
-                            className="border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-brand-pink w-full min-w-0"
+                            className="border border-transparent hover:border-gray-300 focus:border-sonate-orange rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-sonate-orange w-full min-w-0"
                           />
                         ) : (
                           // Grisé hors cabinet : le champ n'a de sens que si
@@ -1115,14 +1115,14 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {/* Title */}
                     {!hiddenColumns.has("title") && (
                       <td className="px-3 py-3" style={{ maxWidth: getColWidth("title", 220) }}>
-                        <div className="font-medium text-brand-dark truncate">{offer.title}</div>
+                        <div className="font-medium text-sonate-ink truncate">{offer.title}</div>
                         {offer.url && (
                           <a
                             href={offer.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="text-xs text-brand-dark underline hover:text-brand-pink"
+                            className="text-xs text-sonate-ink underline hover:text-sonate-orange-dark"
                           >
                             Voir l&apos;offre
                           </a>
@@ -1151,7 +1151,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                               "border rounded px-1 py-0.5 text-xs text-gray-600 bg-transparent focus:outline-none focus:ring-1 w-full min-w-0",
                               urlError[offer.id]
                                 ? "border-red-400 focus:border-red-500 focus:ring-red-400"
-                                : "border-transparent hover:border-gray-300 focus:border-brand-pink focus:ring-brand-pink"
+                                : "border-transparent hover:border-gray-300 focus:border-sonate-orange focus:ring-sonate-orange"
                             )}
                           />
                           {offer.url && (
@@ -1161,7 +1161,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                               rel="noopener noreferrer"
                               title="Ouvrir l'offre"
                               aria-label="Ouvrir l'offre"
-                              className="text-gray-400 hover:text-brand-pink shrink-0 leading-none"
+                              className="text-gray-400 hover:text-sonate-orange-dark shrink-0 leading-none"
                             >
                               <svg
                                 aria-hidden="true"
@@ -1210,7 +1210,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                             }
                           }}
                           title={offer.company}
-                          className="font-medium text-brand-dark bg-transparent border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 w-full min-w-0 focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                          className="font-medium text-sonate-ink bg-transparent border border-transparent hover:border-gray-300 focus:border-sonate-orange rounded px-1 py-0.5 w-full min-w-0 focus:outline-none focus:ring-1 focus:ring-sonate-orange"
                         />
                         <div className="flex gap-2 mt-0.5 px-1">
                           {offer.linkedinPage && (
@@ -1219,7 +1219,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="text-xs text-brand-dark underline hover:text-brand-pink"
+                              className="text-xs text-sonate-ink underline hover:text-sonate-orange-dark"
                             >
                               LinkedIn
                             </a>
@@ -1230,7 +1230,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="text-xs text-brand-dark underline hover:text-brand-pink"
+                              className="text-xs text-sonate-ink underline hover:text-sonate-orange-dark"
                             >
                               Site
                             </a>
@@ -1244,7 +1244,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                       <td className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                         {offer.linkedinPage ? (
                           <a href={offer.linkedinPage} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-brand-dark underline hover:text-brand-pink">
+                            className="text-xs text-sonate-ink underline hover:text-sonate-orange-dark">
                             LinkedIn
                           </a>
                         ) : <span className="text-gray-400">—</span>}
@@ -1256,7 +1256,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                       <td className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                         {offer.website ? (
                           <a href={offer.website} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-brand-dark underline hover:text-brand-pink">
+                            className="text-xs text-sonate-ink underline hover:text-sonate-orange-dark">
                             Site
                           </a>
                         ) : <span className="text-gray-400">—</span>}
@@ -1306,7 +1306,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                       <td className="px-3 py-3" style={{ maxWidth: getColWidth("leadName", 150) }}>
                         {offer.leadFirstName || offer.leadLastName ? (
                           <div>
-                            <div className="font-medium truncate text-brand-dark">
+                            <div className="font-medium truncate text-sonate-ink">
                               {[toProperCase(offer.leadFirstName), toProperCase(offer.leadLastName)]
                                 .filter(Boolean)
                                 .join(" ")}
@@ -1318,7 +1318,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="block text-xs text-brand-dark underline hover:text-brand-pink"
+                                  className="block text-xs text-sonate-ink underline hover:text-sonate-orange-dark"
                                 >
                                   LinkedIn
                                 </a>
@@ -1352,7 +1352,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                           <select
                             value={normalizeCivility(offer.leadCivility) ?? ""}
                             onChange={(e) => updateLeadField(offer.id, "leadCivility", e.target.value || null)}
-                            className="border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-brand-pink w-full"
+                            className="border border-transparent hover:border-gray-300 focus:border-sonate-orange rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-sonate-orange w-full"
                           >
                             <option value="">—</option>
                             <option value="Monsieur">Monsieur</option>
@@ -1370,7 +1370,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                           defaultValue={offer.leadFirstName ?? ""}
                           onBlur={(e) => updateLeadField(offer.id, "leadFirstName", e.target.value || null)}
                           placeholder="—"
-                          className="border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-brand-pink w-full"
+                          className="border border-transparent hover:border-gray-300 focus:border-sonate-orange rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-sonate-orange w-full"
                         />
                       </td>
                     )}
@@ -1383,7 +1383,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                           defaultValue={offer.leadLastName ?? ""}
                           onBlur={(e) => updateLeadField(offer.id, "leadLastName", e.target.value || null)}
                           placeholder="—"
-                          className="border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-brand-pink w-full"
+                          className="border border-transparent hover:border-gray-300 focus:border-sonate-orange rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-sonate-orange w-full"
                         />
                       </td>
                     )}
@@ -1396,7 +1396,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                             <a
                               href={`mailto:${offer.leadEmail}`}
                               onClick={(e) => e.stopPropagation()}
-                              className="hover:underline hover:text-brand-pink"
+                              className="hover:underline hover:text-sonate-orange-dark"
                             >
                               {offer.leadEmail}
                             </a>
@@ -1419,7 +1419,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                       <td className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                         {offer.leadLinkedin ? (
                           <a href={offer.leadLinkedin} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-brand-dark underline hover:text-brand-pink">
+                            className="text-xs text-sonate-ink underline hover:text-sonate-orange-dark">
                             LinkedIn
                           </a>
                         ) : <span className="text-gray-400">—</span>}
@@ -1443,7 +1443,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                             void updatePhoneEnrichment(offer.id, { phoneLookupRequested: e.target.checked });
                           }}
                           className="w-4 h-4 cursor-pointer"
-                          style={{ accentColor: "#FFBEFA" }}
+                          style={{ accentColor: "#123C33" }}
                         />
                       </td>
                     )}
@@ -1463,7 +1463,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                             onBlur={(e) => {
                               void updatePhoneEnrichment(offer.id, { enrichedPhone: e.target.value || null });
                             }}
-                            className="border border-gray-300 px-2 py-1 text-sm w-full text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                            className="border border-gray-300 px-2 py-1 text-sm w-full text-sonate-ink focus:outline-none focus:ring-1 focus:ring-sonate-orange"
                           />
                         )}
                       </td>
@@ -1473,7 +1473,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {!hiddenColumns.has("lgmSent") && (
                       <td className="px-3 py-3 text-center">
                         {offer.lgmSent ? (
-                          <span className="text-xs text-brand-green font-semibold whitespace-nowrap">
+                          <span className="text-xs text-sonate-green-mid font-semibold whitespace-nowrap">
                             {new Date(offer.lgmSentAt ?? offer.contactedAt ?? "").toLocaleDateString("fr-FR")}
                           </span>
                         ) : (
@@ -1497,7 +1497,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {!hiddenColumns.has("lgmMessagesSent") && (
                       <td className="px-3 py-3 text-center">
                         {offer.lgmMessagesSent != null ? (
-                          <span className="text-sm font-semibold text-brand-dark">{offer.lgmMessagesSent}</span>
+                          <span className="text-sm font-semibold text-sonate-ink">{offer.lgmMessagesSent}</span>
                         ) : (
                           <span className="text-gray-300">—</span>
                         )}
@@ -1508,7 +1508,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {!hiddenColumns.has("lgmEmailOpened") && (
                       <td className="px-3 py-3 text-center">
                         {offer.lgmEmailOpened != null ? (
-                          <span className="text-sm font-semibold text-brand-dark">{offer.lgmEmailOpened}</span>
+                          <span className="text-sm font-semibold text-sonate-ink">{offer.lgmEmailOpened}</span>
                         ) : (
                           <span className="text-gray-300">—</span>
                         )}
@@ -1519,7 +1519,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {!hiddenColumns.has("lgmConnectionSentAt") && (
                       <td className="px-3 py-3 text-center">
                         {offer.lgmConnectionSentAt ? (
-                          <span className="text-xs text-blue-600 font-semibold whitespace-nowrap">
+                          <span className="text-xs text-sonate-green font-semibold whitespace-nowrap">
                             {new Date(offer.lgmConnectionSentAt).toLocaleDateString("fr-FR")}
                           </span>
                         ) : (
@@ -1532,7 +1532,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {!hiddenColumns.has("lgmConnectionAcceptedAt") && (
                       <td className="px-3 py-3 text-center">
                         {offer.lgmConnectionAcceptedAt ? (
-                          <span className="text-xs text-blue-700 font-semibold whitespace-nowrap">
+                          <span className="text-xs text-sonate-green font-semibold whitespace-nowrap">
                             {new Date(offer.lgmConnectionAcceptedAt).toLocaleDateString("fr-FR")}
                           </span>
                         ) : (
@@ -1545,7 +1545,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {!hiddenColumns.has("lgmMessage1SentAt") && (
                       <td className="px-3 py-3 text-center">
                         {offer.lgmMessage1SentAt ? (
-                          <span className="text-xs text-indigo-600 font-semibold whitespace-nowrap">
+                          <span className="text-xs text-sonate-green font-semibold whitespace-nowrap">
                             {new Date(offer.lgmMessage1SentAt).toLocaleDateString("fr-FR")}
                           </span>
                         ) : (
@@ -1558,7 +1558,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {!hiddenColumns.has("lgmRepliedAt") && (
                       <td className="px-3 py-3 text-center">
                         {offer.lgmRepliedAt ? (
-                          <span className="text-xs text-brand-green font-semibold whitespace-nowrap">
+                          <span className="text-xs text-sonate-green-mid font-semibold whitespace-nowrap">
                             {new Date(offer.lgmRepliedAt).toLocaleDateString("fr-FR")}
                           </span>
                         ) : (
@@ -1599,12 +1599,12 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
 
                   {/* Expanded row */}
                   {expandedRow === offer.id && (
-                    <tr key={`${offer.id}-expanded`} className="bg-[#FFBEFA]/10 border-b border-gray-200">
+                    <tr key={`${offer.id}-expanded`} className="bg-[#123C33]/10 border-b border-gray-200">
                       <td colSpan={visibleCount} className="px-6 py-4">
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
                           {offer.description && (
                             <div className="col-span-full">
-                              <span className="font-medium text-brand-dark">Description : </span>
+                              <span className="font-medium text-sonate-ink">Description : </span>
                               <p className="text-gray-600 mt-1 whitespace-pre-wrap">{offer.description}</p>
                             </div>
                           )}
@@ -1631,7 +1631,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1.5 text-sm border border-gray-300 disabled:opacity-40 hover:bg-white text-brand-dark transition-colors"
+            className="px-3 py-1.5 text-sm border border-gray-300 disabled:opacity-40 hover:bg-sonate-ivory-light text-sonate-ink transition-colors"
           >
             ← Précédent
           </button>
@@ -1641,7 +1641,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-3 py-1.5 text-sm border border-gray-300 disabled:opacity-40 hover:bg-white text-brand-dark transition-colors"
+            className="px-3 py-1.5 text-sm border border-gray-300 disabled:opacity-40 hover:bg-sonate-ivory-light text-sonate-ink transition-colors"
           >
             Suivant →
           </button>
@@ -1697,7 +1697,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
 function DuplicateBadge({ warning }: { warning: string }) {
   const config = {
     imported: { label: "déjà importé", className: "bg-yellow-100 text-yellow-700 border-yellow-200" },
-    contacted: { label: "déjà contacté", className: "bg-blue-100 text-blue-700 border-blue-200" },
+    contacted: { label: "déjà contacté", className: "bg-sonate-green-100 text-sonate-green border-sonate-green-border" },
     do_not_contact: { label: "ne pas contacter", className: "bg-red-100 text-red-600 border-red-200" },
   }[warning] ?? { label: "doublon", className: "bg-gray-100 text-gray-500 border-gray-200" };
 
@@ -1711,7 +1711,7 @@ function DuplicateBadge({ warning }: { warning: string }) {
 function StatBadge({ label, value, color }: { label: string; value: number; color: "gray" | "green" | "red" | "orange" }) {
   const colorClass =
     color === "green"
-      ? "bg-[#26B743]/10 text-[#26B743] border-[#26B743]/20"
+      ? "bg-[#2f7d5b]/10 text-[#2f7d5b] border-[#2f7d5b]/20"
       : color === "red"
       ? "bg-red-50 text-red-500 border-red-100"
       : color === "orange"
@@ -1765,13 +1765,13 @@ function AudienceDropdownCell({
         value={currentValue}
         onChange={(e) => handleChange(e.target.value)}
         className={cn(
-          "text-xs border px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-pink bg-white",
+          "text-xs border px-2 py-1 focus:outline-none focus:ring-1 focus:ring-sonate-orange bg-sonate-ivory-light",
           offer.doNotContact
             ? "border-red-200 text-red-500"
             : offer.badContact
             ? "border-orange-200 text-orange-500"
             : offer.toContact
-            ? "border-[#26B743]/30 text-[#26B743]"
+            ? "border-[#2f7d5b]/30 text-[#2f7d5b]"
             : "border-gray-200 text-gray-500"
         )}
       >
@@ -1797,7 +1797,7 @@ function Detail({ label, value }: { label: string; value: string | null | undefi
   if (!value) return null;
   return (
     <div>
-      <span className="font-medium text-brand-dark">{label} : </span>
+      <span className="font-medium text-sonate-ink">{label} : </span>
       <span className="text-gray-600">{value}</span>
     </div>
   );
@@ -1820,8 +1820,8 @@ function LgmTimeline({ offer }: { offer: JobOffer }) {
   if (events.length === 0) return null;
 
   return (
-    <div className="mt-4 border-t border-brand-pink/20 pt-4">
-      <p className="text-xs font-medium text-brand-dark mb-3">Conversation LGM</p>
+    <div className="mt-4 border-t border-sonate-green-border pt-4">
+      <p className="text-xs font-medium text-sonate-ink mb-3">Conversation LGM</p>
       <div className="space-y-2">
         {events.map((ev, i) => (
           <div key={i} className="flex items-start gap-3">
@@ -1830,8 +1830,8 @@ function LgmTimeline({ offer }: { offer: JobOffer }) {
             </span>
             <div className={cn(
               "flex-1 text-xs px-3 py-1.5 border-l-2",
-              ev.type === "sent" && "border-l-brand-dark text-brand-dark",
-              ev.type === "received" && "border-l-[#26B743] text-[#26B743]",
+              ev.type === "sent" && "border-l-sonate-green text-sonate-ink",
+              ev.type === "received" && "border-l-[#2f7d5b] text-[#2f7d5b]",
               ev.type === "neutral" && "border-l-gray-300 text-gray-500",
             )}>
               <span className="font-medium">{ev.label}</span>
@@ -1876,12 +1876,12 @@ function CustomFieldCell({
           defaultValue={value != null ? String(value) : ""}
           onBlur={(e) => onChange(e.target.value || null)}
           placeholder="—"
-          className="border border-transparent hover:border-gray-300 focus:border-brand-pink rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-brand-pink flex-1 min-w-0"
+          className="border border-transparent hover:border-gray-300 focus:border-sonate-orange rounded px-1 py-0.5 text-sm text-gray-600 bg-transparent focus:outline-none focus:ring-1 focus:ring-sonate-orange flex-1 min-w-0"
         />
         <button
           onClick={onGenerate}
           disabled={aiLoading}
-          className="text-brand-pink hover:opacity-70 disabled:opacity-40 text-base shrink-0"
+          className="text-sonate-orange-dark hover:opacity-70 disabled:opacity-40 text-base shrink-0"
           title="Générer avec l'IA"
         >
           {aiLoading ? (
@@ -1901,7 +1901,7 @@ function CustomFieldCell({
         checked={Boolean(value)}
         onChange={(e) => onChange(e.target.checked)}
         className="w-4 h-4 cursor-pointer"
-        style={{ accentColor: "#FFBEFA" }}
+        style={{ accentColor: "#123C33" }}
       />
     );
   }
@@ -1912,7 +1912,7 @@ function CustomFieldCell({
         type="number"
         defaultValue={value != null ? String(value) : ""}
         onBlur={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
-        className="border border-gray-300 px-2 py-1 text-sm w-24 text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-pink"
+        className="border border-gray-300 px-2 py-1 text-sm w-24 text-sonate-ink focus:outline-none focus:ring-1 focus:ring-sonate-orange"
       />
     );
   }
@@ -1922,7 +1922,7 @@ function CustomFieldCell({
       type={field.type === "DATE" ? "date" : "text"}
       defaultValue={value != null ? String(value) : ""}
       onBlur={(e) => onChange(e.target.value || null)}
-      className="border border-gray-300 px-2 py-1 text-sm w-full text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-pink"
+      className="border border-gray-300 px-2 py-1 text-sm w-full text-sonate-ink focus:outline-none focus:ring-1 focus:ring-sonate-orange"
     />
   );
 }
@@ -1948,7 +1948,7 @@ function ChoiceRow({
           className={cn(
             "px-2 py-1 text-xs border -ml-px first:ml-0 transition-colors",
             value === option.value
-              ? "border-brand-pink bg-brand-pink text-brand-dark font-medium z-10"
+              ? "border-sonate-green bg-sonate-green text-sonate-ivory font-medium z-10"
               : "border-gray-300 text-gray-600 hover:bg-gray-50"
           )}
         >

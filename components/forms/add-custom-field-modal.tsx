@@ -107,9 +107,9 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
   const supportsLgm = type !== "FORMULA";
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4 text-brand-dark">Ajouter un champ personnalisé</h2>
+    <div className="fixed inset-0 bg-sonate-green-dark/50 flex items-center justify-center z-50">
+      <div className="bg-sonate-ivory-light rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg font-semibold mb-4 text-sonate-green">Ajouter un champ personnalisé</h2>
 
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
@@ -120,7 +120,7 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Label */}
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1">
+            <label className="block text-sm font-medium text-sonate-ink mb-1">
               Nom du champ
             </label>
             <input
@@ -129,17 +129,17 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
               onChange={(e) => setLabel(e.target.value)}
               required
               placeholder="Ex: Score, Secteur, Titre nettoyé..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
             />
           </div>
 
           {/* Type */}
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1">Type</label>
+            <label className="block text-sm font-medium text-sonate-ink mb-1">Type</label>
             <select
               value={type}
               onChange={(e) => { setType(e.target.value); setFormula(""); setAutoFill(false); }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
             >
               {FIELD_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>{t.label}</option>
@@ -150,14 +150,14 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
           {/* Formule */}
           {isFormula && (
             <div>
-              <label className="block text-sm font-medium text-brand-dark mb-1">Formule</label>
+              <label className="block text-sm font-medium text-sonate-ink mb-1">Formule</label>
               <input
                 type="text"
                 value={formula}
                 onChange={(e) => setFormula(e.target.value)}
                 required
                 placeholder="Ex: {title} — {company}"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
               />
               <VarPicker vars={FORMULA_VARS} onInsert={(v) => setFormula((f) => f + v)} />
             </div>
@@ -166,14 +166,14 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
           {/* Prompt IA */}
           {isAI && (
             <div>
-              <label className="block text-sm font-medium text-brand-dark mb-1">Prompt IA</label>
+              <label className="block text-sm font-medium text-sonate-ink mb-1">Prompt IA</label>
               <textarea
                 value={formula}
                 onChange={(e) => setFormula(e.target.value)}
                 required
                 rows={3}
                 placeholder="Ex: Nettoie ce titre d'offre pour un message de prospection : {{title}}"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink resize-none"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange resize-none"
               />
               <VarPicker vars={aiVars} onInsert={(v) => setFormula((f) => f + v)} />
               <p className="text-xs text-gray-400 mt-1.5">
@@ -190,10 +190,10 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
                 checked={autoFill}
                 onChange={(e) => setAutoFill(e.target.checked)}
                 className="mt-0.5 w-4 h-4 cursor-pointer shrink-0"
-                style={{ accentColor: "#FFBEFA" }}
+                style={{ accentColor: "#123C33" }}
               />
               <div>
-                <span className="text-sm font-medium text-brand-dark">Remplissage automatique</span>
+                <span className="text-sm font-medium text-sonate-ink">Remplissage automatique</span>
                 <p className="text-xs text-gray-500 mt-0.5">
                   Ce champ sera généré par l&apos;IA à chaque nouvelle offre reçue via webhook, en arrière-plan.
                 </p>
@@ -204,13 +204,13 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
           {/* LGM custom attribute */}
           {supportsLgm && (
             <div>
-              <label className="block text-sm font-medium text-brand-dark mb-1">
+              <label className="block text-sm font-medium text-sonate-ink mb-1">
                 Envoyer vers LGM
               </label>
               <select
                 value={lgmAttribute}
                 onChange={(e) => setLgmAttribute(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
               >
                 {LGM_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
@@ -227,7 +227,7 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
           {/* Emelia custom attribute */}
           {supportsLgm && (
             <div>
-              <label className="block text-sm font-medium text-brand-dark mb-1">
+              <label className="block text-sm font-medium text-sonate-ink mb-1">
                 Envoyer vers Emelia <span className="text-gray-400 font-normal">(clé du champ custom)</span>
               </label>
               <input
@@ -235,7 +235,7 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
                 value={emeliAttribute}
                 onChange={(e) => setEmeliAttribute(e.target.value)}
                 placeholder="Ex: score, secteur, titre_nettoye..."
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
               />
               {emeliAttribute && (
                 <p className="text-xs text-gray-400 mt-1">
@@ -249,14 +249,14 @@ export function AddCustomFieldModal({ onClose, onCreated, existingCustomFields =
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 rounded-lg py-2 text-sm text-brand-dark hover:bg-gray-50"
+              className="flex-1 border border-gray-300 rounded-lg py-2 text-sm text-sonate-ink hover:bg-gray-50"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-brand-pink text-brand-dark rounded-lg py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+              className="flex-1 bg-sonate-green text-sonate-ivory rounded-lg py-2 text-sm font-medium hover:bg-sonate-green-dark disabled:opacity-50 transition-opacity"
             >
               {loading ? "Création..." : "Créer"}
             </button>
@@ -284,7 +284,7 @@ function VarPicker({
             type="button"
             onClick={() => onInsert(v.key)}
             title={v.label}
-            className="text-xs bg-gray-100 hover:bg-brand-pink/20 text-brand-dark rounded px-1.5 py-0.5 font-mono transition-colors"
+            className="text-xs bg-gray-100 hover:bg-sonate-green-100 text-sonate-ink rounded px-1.5 py-0.5 font-mono transition-colors"
           >
             {v.key}
           </button>
