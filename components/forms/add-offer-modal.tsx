@@ -52,11 +52,11 @@ export function AddOfferModal({ workspaceId, onClose, onAdded }: AddOfferModalPr
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-sonate-green-dark/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-sonate-ivory-light rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-start justify-between gap-4 mb-4">
-          <h2 className="text-lg font-semibold text-brand-dark">Ajouter un contact</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-brand-dark text-xl" aria-label="Fermer">×</button>
+          <h2 className="text-lg font-semibold text-sonate-green">Ajouter un contact</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-sonate-green text-xl" aria-label="Fermer">×</button>
         </div>
 
         {error && (
@@ -92,7 +92,7 @@ export function AddOfferModal({ workspaceId, onClose, onAdded }: AddOfferModalPr
                 type="checkbox"
                 checked={recruitingAgency}
                 onChange={(e) => setRecruitingAgency(e.target.checked)}
-                style={{ accentColor: "#FFBEFA" }}
+                style={{ accentColor: "#123C33" }}
                 className="w-4 h-4"
               />
               Cabinet recrutement
@@ -104,13 +104,13 @@ export function AddOfferModal({ workspaceId, onClose, onAdded }: AddOfferModalPr
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 text-brand-dark hover:bg-gray-50">
+          <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 text-sonate-ink hover:bg-gray-50">
             Annuler
           </button>
           <button
             onClick={() => void handleSubmit()}
             disabled={loading}
-            className="px-4 py-2 text-sm bg-brand-pink text-brand-dark font-medium hover:opacity-90 disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-sonate-green text-sonate-ivory font-medium hover:bg-sonate-green-dark disabled:opacity-50"
           >
             {loading ? "Ajout…" : "Ajouter"}
           </button>
@@ -123,7 +123,7 @@ export function AddOfferModal({ workspaceId, onClose, onAdded }: AddOfferModalPr
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="border border-gray-200 rounded-lg p-3 space-y-3">
-      <h3 className="text-sm font-semibold text-brand-dark">{title}</h3>
+      <h3 className="text-sm font-semibold text-sonate-green">{title}</h3>
       {children}
     </div>
   );
@@ -150,7 +150,7 @@ function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full border border-gray-300 px-2 py-1.5 text-sm text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink"
+        className="w-full border border-gray-300 px-2 py-1.5 text-sm text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-1 focus:ring-sonate-orange"
       />
     </label>
   );

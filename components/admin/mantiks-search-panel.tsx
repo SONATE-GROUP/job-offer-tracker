@@ -100,12 +100,12 @@ function TagInput({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAdd(); } }}
           placeholder={placeholder}
-          className="flex-1 border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+          className="flex-1 border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
         />
         <button
           type="button"
           onClick={handleAdd}
-          className="px-3 py-1.5 text-sm border border-gray-300 hover:bg-gray-50 text-brand-dark whitespace-nowrap"
+          className="px-3 py-1.5 text-sm border border-gray-300 hover:bg-gray-50 text-sonate-ink whitespace-nowrap"
         >
           +
         </button>
@@ -113,9 +113,9 @@ function TagInput({
       {values.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2">
           {values.map((v) => (
-            <span key={v} className="inline-flex items-center gap-1 bg-brand-dark text-white px-2 py-0.5 text-xs">
+            <span key={v} className="inline-flex items-center gap-1 bg-sonate-green text-sonate-ivory px-2 py-0.5 text-xs">
               {v}
-              <button type="button" onClick={() => onRemove(v)} className="hover:text-brand-pink ml-0.5">×</button>
+              <button type="button" onClick={() => onRemove(v)} className="hover:text-sonate-orange ml-0.5">×</button>
             </span>
           ))}
         </div>
@@ -263,35 +263,35 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="border border-brand-pink/40 bg-brand-pink/5">
+    <div className="border border-sonate-green-border bg-sonate-green-50">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-brand-dark hover:bg-brand-pink/10 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-sonate-ink hover:bg-sonate-green-100 transition-colors"
       >
         <span>🔍 Recherche Mantiks</span>
         <span className="text-gray-400 text-xs">{open ? "▲ Réduire" : "▼ Ouvrir"}</span>
       </button>
 
       {open && (
-        <div className="border-t border-brand-pink/30">
+        <div className="border-t border-sonate-green-border">
           {/* Tabs */}
           <div className="flex border-b border-gray-200">
             <button
               type="button"
               onClick={() => setActiveTab("search")}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "search" ? "border-brand-dark text-brand-dark" : "border-transparent text-gray-500 hover:text-brand-dark"}`}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "search" ? "border-sonate-green text-sonate-ink" : "border-transparent text-gray-500 hover:text-sonate-green"}`}
             >
               Nouvelle recherche
             </button>
             <button
               type="button"
               onClick={() => { setActiveTab("saved"); fetchSavedSearches(); }}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "saved" ? "border-brand-dark text-brand-dark" : "border-transparent text-gray-500 hover:text-brand-dark"}`}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "saved" ? "border-sonate-green text-sonate-ink" : "border-transparent text-gray-500 hover:text-sonate-green"}`}
             >
               Recherches sauvegardées
               {savedSearches.length > 0 && (
-                <span className="ml-1.5 bg-brand-dark text-white text-xs px-1.5 py-0.5">{savedSearches.length}</span>
+                <span className="ml-1.5 bg-sonate-green text-sonate-ivory text-xs px-1.5 py-0.5">{savedSearches.length}</span>
               )}
             </button>
           </div>
@@ -306,47 +306,47 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-brand-dark mb-1">Ancienneté <span className="text-red-400">*</span></label>
+                    <label className="block text-xs font-medium text-sonate-ink mb-1">Ancienneté <span className="text-red-400">*</span></label>
                     <select
                       value={filters.job_age_in_days}
                       onChange={(e) => setF("job_age_in_days", Number(e.target.value))}
-                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink bg-white"
+                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange bg-sonate-ivory-light"
                     >
                       {AGE_OPTIONS.map((a) => <option key={a.value} value={a.value}>{a.label}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-brand-dark mb-1">Job board</label>
+                    <label className="block text-xs font-medium text-sonate-ink mb-1">Job board</label>
                     <select
                       value={filters.job_board}
                       onChange={(e) => setF("job_board", e.target.value)}
-                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink bg-white"
+                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange bg-sonate-ivory-light"
                     >
                       {JOB_BOARDS.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-brand-dark mb-1">Nb offres min par entreprise</label>
+                    <label className="block text-xs font-medium text-sonate-ink mb-1">Nb offres min par entreprise</label>
                     <input
                       type="number" min={1} value={filters.nb_min_job_posted ?? ""}
                       onChange={(e) => setF("nb_min_job_posted", e.target.value ? parseInt(e.target.value) : undefined)}
                       placeholder="ex: 2"
-                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-brand-dark mb-1">Nb offres max par entreprise</label>
+                    <label className="block text-xs font-medium text-sonate-ink mb-1">Nb offres max par entreprise</label>
                     <input
                       type="number" min={1} value={filters.nb_max_job_posted ?? ""}
                       onChange={(e) => setF("nb_max_job_posted", e.target.value ? parseInt(e.target.value) : undefined)}
                       placeholder="ex: 10"
-                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-brand-dark mb-1">Localisations <span className="text-red-400">*</span> <span className="text-gray-400 font-normal">(IDs Mantiks — ex: 2988507 = Paris)</span></label>
+                  <label className="block text-xs font-medium text-sonate-ink mb-1">Localisations <span className="text-red-400">*</span> <span className="text-gray-400 font-normal">(IDs Mantiks — ex: 2988507 = Paris)</span></label>
                   <TagInput
                     values={filters.job_location_ids}
                     onAdd={(v) => { const n = parseInt(v); if (!isNaN(n) && !filters.job_location_ids.includes(n)) setF("job_location_ids", [...filters.job_location_ids, n]); }}
@@ -357,7 +357,7 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-brand-dark mb-1">Mots-clés dans le titre</label>
+                  <label className="block text-xs font-medium text-sonate-ink mb-1">Mots-clés dans le titre</label>
                   <TagInput
                     values={filters.job_title}
                     onAdd={(v) => { if (!filters.job_title.includes(v)) setF("job_title", [...filters.job_title, v]); }}
@@ -365,13 +365,13 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                     placeholder="ex: sales, account manager..."
                   />
                   <label className="flex items-center gap-2 mt-2 text-xs text-gray-600 cursor-pointer select-none">
-                    <input type="checkbox" checked={filters.job_title_include_all} onChange={(e) => setF("job_title_include_all", e.target.checked)} className="accent-brand-dark" />
+                    <input type="checkbox" checked={filters.job_title_include_all} onChange={(e) => setF("job_title_include_all", e.target.checked)} className="accent-sonate-green" />
                     Logique AND (tous les mots-clés requis)
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-brand-dark mb-1">Mots-clés à exclure du titre</label>
+                  <label className="block text-xs font-medium text-sonate-ink mb-1">Mots-clés à exclure du titre</label>
                   <TagInput
                     values={filters.job_title_excluded}
                     onAdd={(v) => { if (!filters.job_title_excluded.includes(v)) setF("job_title_excluded", [...filters.job_title_excluded, v]); }}
@@ -381,7 +381,7 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-brand-dark mb-1">Mots-clés dans la description</label>
+                  <label className="block text-xs font-medium text-sonate-ink mb-1">Mots-clés dans la description</label>
                   <TagInput
                     values={filters.job_description}
                     onAdd={(v) => { if (!filters.job_description.includes(v)) setF("job_description", [...filters.job_description, v]); }}
@@ -389,13 +389,13 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                     placeholder="ex: CRM, Salesforce..."
                   />
                   <label className="flex items-center gap-2 mt-2 text-xs text-gray-600 cursor-pointer select-none">
-                    <input type="checkbox" checked={filters.job_description_include_all} onChange={(e) => setF("job_description_include_all", e.target.checked)} className="accent-brand-dark" />
+                    <input type="checkbox" checked={filters.job_description_include_all} onChange={(e) => setF("job_description_include_all", e.target.checked)} className="accent-sonate-green" />
                     Logique AND (tous les mots-clés requis)
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-brand-dark mb-1">Mots-clés à exclure de la description</label>
+                  <label className="block text-xs font-medium text-sonate-ink mb-1">Mots-clés à exclure de la description</label>
                   <TagInput
                     values={filters.job_description_excluded}
                     onAdd={(v) => { if (!filters.job_description_excluded.includes(v)) setF("job_description_excluded", [...filters.job_description_excluded, v]); }}
@@ -411,27 +411,27 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-brand-dark mb-1">Taille min (employés)</label>
+                    <label className="block text-xs font-medium text-sonate-ink mb-1">Taille min (employés)</label>
                     <input
                       type="number" min={1} value={filters.min_company_size ?? ""}
                       onChange={(e) => setF("min_company_size", e.target.value ? parseInt(e.target.value) : undefined)}
                       placeholder="ex: 10"
-                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-brand-dark mb-1">Taille max (employés)</label>
+                    <label className="block text-xs font-medium text-sonate-ink mb-1">Taille max (employés)</label>
                     <input
                       type="number" min={1} value={filters.max_company_size ?? ""}
                       onChange={(e) => setF("max_company_size", e.target.value ? parseInt(e.target.value) : undefined)}
                       placeholder="ex: 500"
-                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-brand-dark mb-1">Secteurs d&apos;activité inclus</label>
+                  <label className="block text-xs font-medium text-sonate-ink mb-1">Secteurs d&apos;activité inclus</label>
                   <TagInput
                     values={filters.company_industry}
                     onAdd={(v) => { if (!filters.company_industry.includes(v)) setF("company_industry", [...filters.company_industry, v]); }}
@@ -441,7 +441,7 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-brand-dark mb-1">Secteurs exclus <span className="text-gray-400 font-normal">(défaut: recruiting, consulting)</span></label>
+                  <label className="block text-xs font-medium text-sonate-ink mb-1">Secteurs exclus <span className="text-gray-400 font-normal">(défaut: recruiting, consulting)</span></label>
                   <TagInput
                     values={filters.company_industry_excluded}
                     onAdd={(v) => { if (!filters.company_industry_excluded.includes(v)) setF("company_industry_excluded", [...filters.company_industry_excluded, v]); }}
@@ -450,8 +450,8 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                   />
                 </div>
 
-                <label className="flex items-center gap-2 text-sm text-brand-dark cursor-pointer select-none">
-                  <input type="checkbox" checked={filters.company_funding} onChange={(e) => setF("company_funding", e.target.checked)} className="accent-brand-dark" />
+                <label className="flex items-center gap-2 text-sm text-sonate-ink cursor-pointer select-none">
+                  <input type="checkbox" checked={filters.company_funding} onChange={(e) => setF("company_funding", e.target.checked)} className="accent-sonate-green" />
                   Entreprises avec levée de fonds uniquement
                 </label>
               </fieldset>
@@ -462,11 +462,11 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
 
                 <div className="flex items-end gap-3">
                   <div className="w-28">
-                    <label className="block text-xs font-medium text-brand-dark mb-1">Limite</label>
+                    <label className="block text-xs font-medium text-sonate-ink mb-1">Limite</label>
                     <input
                       type="number" min={1} max={500} value={filters.limit}
                       onChange={(e) => setF("limit", e.target.value ? parseInt(e.target.value) : 10)}
-                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                      className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
                     />
                   </div>
                   <div className="flex-1 flex gap-2">
@@ -474,7 +474,7 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                       type="button"
                       onClick={() => handleSearch()}
                       disabled={loading}
-                      className="flex-1 bg-brand-dark text-white px-5 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                      className="flex-1 bg-sonate-green text-sonate-ivory px-5 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
                     >
                       {loading ? "Recherche en cours..." : "Lancer la recherche"}
                     </button>
@@ -497,13 +497,13 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                     onChange={(e) => setSaveName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSave(); } }}
                     placeholder="Nom de la recherche à sauvegarder..."
-                    className="flex-1 border border-gray-300 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                    className="flex-1 border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
                   />
                   <button
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-4 py-1.5 text-sm border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-white disabled:opacity-50 transition-colors whitespace-nowrap"
+                    className="px-4 py-1.5 text-sm border border-sonate-green text-sonate-ink hover:bg-sonate-green hover:text-sonate-ivory disabled:opacity-50 transition-colors whitespace-nowrap"
                   >
                     {saving ? "..." : "Sauvegarder"}
                   </button>
@@ -530,32 +530,32 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
 
                   <div className="space-y-3">
                     {results.companies?.map((company, ci) => (
-                      <div key={ci} className="border border-gray-200 bg-white">
+                      <div key={ci} className="border border-gray-200 bg-sonate-ivory-light">
                         <div className="flex items-start justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
                           <div>
-                            <p className="font-medium text-sm text-brand-dark">{company.name}</p>
+                            <p className="font-medium text-sm text-sonate-ink">{company.name}</p>
                             <div className="flex flex-wrap gap-x-3 mt-0.5">
                               {company.industry && <span className="text-xs text-gray-500">{company.industry}</span>}
                               {company.employee_count && <span className="text-xs text-gray-500">{company.employee_count} employés</span>}
                             </div>
                           </div>
                           <div className="flex gap-2 shrink-0 ml-3">
-                            {company.website && <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-dark underline hover:no-underline">Site</a>}
-                            {company.linkedin && <a href={company.linkedin} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-dark underline hover:no-underline">LinkedIn</a>}
+                            {company.website && <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-xs text-sonate-ink underline hover:no-underline">Site</a>}
+                            {company.linkedin && <a href={company.linkedin} target="_blank" rel="noopener noreferrer" className="text-xs text-sonate-ink underline hover:no-underline">LinkedIn</a>}
                           </div>
                         </div>
                         <div className="divide-y divide-gray-100">
                           {company.jobs?.map((job, ji) => (
                             <div key={ji} className="px-4 py-2 flex items-start justify-between gap-3">
                               <div className="min-w-0">
-                                <p className="text-sm text-brand-dark truncate">{job.title}</p>
+                                <p className="text-sm text-sonate-ink truncate">{job.title}</p>
                                 <div className="flex flex-wrap gap-x-2 mt-0.5">
                                   {job.location && <span className="text-xs text-gray-400">{job.location}</span>}
                                   {job.job_board && <span className="text-xs text-gray-400 capitalize">{job.job_board}</span>}
                                   {job.published_at && <span className="text-xs text-gray-400">{new Date(job.published_at).toLocaleDateString("fr-FR")}</span>}
                                 </div>
                               </div>
-                              {job.url && <a href={job.url} target="_blank" rel="noopener noreferrer" className="text-xs text-brand-dark underline hover:no-underline shrink-0">Voir</a>}
+                              {job.url && <a href={job.url} target="_blank" rel="noopener noreferrer" className="text-xs text-sonate-ink underline hover:no-underline shrink-0">Voir</a>}
                             </div>
                           ))}
                         </div>
@@ -567,7 +567,7 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                         type="button"
                         onClick={() => handleSearch(undefined, nextOffset)}
                         disabled={loadingMore}
-                        className="w-full py-2 text-sm text-brand-dark border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                        className="w-full py-2 text-sm text-sonate-ink border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
                       >
                         {loadingMore ? "Chargement..." : "Charger plus de résultats"}
                       </button>
@@ -588,9 +588,9 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
               ) : (
                 <div className="space-y-2">
                   {savedSearches.map((search) => (
-                    <div key={search.id} className="border border-gray-200 bg-white px-4 py-3 flex items-start gap-3">
+                    <div key={search.id} className="border border-gray-200 bg-sonate-ivory-light px-4 py-3 flex items-start gap-3">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-brand-dark">{search.name}</p>
+                        <p className="text-sm font-medium text-sonate-ink">{search.name}</p>
                         <p className="text-xs text-gray-400 mt-0.5">
                           Créée le {new Date(search.createdAt).toLocaleDateString("fr-FR")}
                           {search.filters.job_age_in_days && ` · ${search.filters.job_age_in_days}j`}
@@ -602,7 +602,7 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                         <button
                           type="button"
                           onClick={() => loadSearch(search)}
-                          className="px-3 py-1 text-xs border border-gray-300 hover:bg-gray-50 text-brand-dark"
+                          className="px-3 py-1 text-xs border border-gray-300 hover:bg-gray-50 text-sonate-ink"
                           title="Charger les filtres"
                         >
                           Charger
@@ -610,7 +610,7 @@ export function MantikSearchPanel({ workspaceId }: { workspaceId: string }) {
                         <button
                           type="button"
                           onClick={() => runSearch(search)}
-                          className="px-3 py-1 text-xs bg-brand-dark text-white hover:opacity-90"
+                          className="px-3 py-1 text-xs bg-sonate-green text-sonate-ivory hover:opacity-90"
                           title="Exécuter la recherche"
                         >
                           ▶ Exécuter

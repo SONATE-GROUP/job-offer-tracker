@@ -82,9 +82,9 @@ export function EditCustomFieldPromptModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-1 text-brand-dark">
+    <div className="fixed inset-0 bg-sonate-green-dark/50 flex items-center justify-center z-50">
+      <div className="bg-sonate-ivory-light rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <h2 className="text-lg font-semibold mb-1 text-sonate-green">
           Modifier le {isAI ? "prompt IA" : "formule"} — {field.label}
         </h2>
 
@@ -96,7 +96,7 @@ export function EditCustomFieldPromptModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div>
-            <label className="block text-sm font-medium text-brand-dark mb-1">
+            <label className="block text-sm font-medium text-sonate-ink mb-1">
               {isAI ? "Prompt IA" : "Formule"}
             </label>
             {isAI ? (
@@ -106,7 +106,7 @@ export function EditCustomFieldPromptModal({
                 required
                 rows={4}
                 placeholder="Ex: Nettoie ce titre d'offre pour un message de prospection : {{title}}"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink resize-none"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange resize-none"
               />
             ) : (
               <input
@@ -115,7 +115,7 @@ export function EditCustomFieldPromptModal({
                 onChange={(e) => setFormula(e.target.value)}
                 required
                 placeholder="Ex: {title} — {company}"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-pink"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
               />
             )}
             <VarPicker vars={vars} onInsert={(v) => setFormula((f) => f + v)} />
@@ -130,14 +130,14 @@ export function EditCustomFieldPromptModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 rounded-lg py-2 text-sm text-brand-dark hover:bg-gray-50"
+              className="flex-1 border border-gray-300 rounded-lg py-2 text-sm text-sonate-ink hover:bg-gray-50"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-brand-pink text-brand-dark rounded-lg py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+              className="flex-1 bg-sonate-green text-sonate-ivory rounded-lg py-2 text-sm font-medium hover:bg-sonate-green-dark disabled:opacity-50 transition-opacity"
             >
               {loading ? "Enregistrement..." : "Enregistrer"}
             </button>
@@ -165,7 +165,7 @@ function VarPicker({
             type="button"
             onClick={() => onInsert(v.key)}
             title={v.label}
-            className="text-xs bg-gray-100 hover:bg-brand-pink/20 text-brand-dark rounded px-1.5 py-0.5 font-mono transition-colors"
+            className="text-xs bg-gray-100 hover:bg-sonate-green-100 text-sonate-ink rounded px-1.5 py-0.5 font-mono transition-colors"
           >
             {v.key}
           </button>

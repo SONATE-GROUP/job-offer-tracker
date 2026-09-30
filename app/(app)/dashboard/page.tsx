@@ -26,7 +26,7 @@ export default async function DashboardPage({ searchParams }: Props) {
   if (!targetWorkspaceId) {
     return (
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold text-brand-dark">Offres & Leads</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-sonate-green">Offres & Leads</h1>
         <p className="text-sm text-gray-500">Aucun workspace sélectionné.</p>
       </div>
     );
@@ -51,7 +51,7 @@ export default async function DashboardPage({ searchParams }: Props) {
     <div>
       <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-brand-dark">Offres & Leads</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-sonate-green">Offres & Leads</h1>
           <p className="text-sm text-gray-500 mt-1">
             {isAdmin ? `Workspace: ${workspace?.name ?? "Inconnu"}` : "Toutes les offres reçues via votre webhook"}
           </p>

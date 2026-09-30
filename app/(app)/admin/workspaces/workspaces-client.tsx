@@ -125,19 +125,19 @@ export function AdminWorkspacesClient() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-brand-dark">Workspaces</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-sonate-green">Workspaces</h1>
         <p className="text-sm text-gray-500 mt-1">Créer, renommer, supprimer et gérer les membres.</p>
       </div>
 
-      <form onSubmit={createWorkspace} className="bg-white border border-gray-200 p-4 flex gap-2">
+      <form onSubmit={createWorkspace} className="bg-sonate-ivory-light border border-gray-200 p-4 flex gap-2">
         <input
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Nom du workspace"
-          className="flex-1 border border-gray-300 px-3 py-2 text-sm text-brand-dark"
+          className="flex-1 border border-gray-300 px-3 py-2 text-sm text-sonate-ink"
           required
         />
-        <button type="submit" className="bg-brand-pink text-brand-dark px-4 py-2 text-sm font-medium">
+        <button type="submit" className="bg-sonate-green text-sonate-ivory px-4 py-2 text-sm font-medium">
           + Créer
         </button>
       </form>
@@ -153,23 +153,23 @@ export function AdminWorkspacesClient() {
             const availableUsers = users.filter((u) => u.workspaceId !== workspace.id);
 
             return (
-              <section key={workspace.id} className="bg-white border border-gray-200 p-4 space-y-3">
+              <section key={workspace.id} className="bg-sonate-ivory-light border border-gray-200 p-4 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="font-semibold text-brand-dark">{workspace.name}</h2>
+                    <h2 className="font-semibold text-sonate-green">{workspace.name}</h2>
                     <p className="text-xs text-gray-500 mt-1">
                       {workspace._count.users} user(s) · {workspace._count.jobOffers} offre(s) · {workspace._count.customFields} champ(s)
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <a href={`/settings?workspaceId=${workspace.id}`} className="text-xs underline text-brand-dark">Paramètres</a>
-                    <button onClick={() => renameWorkspace(workspace.id, workspace.name)} className="text-xs text-brand-dark underline" type="button">Renommer</button>
+                    <a href={`/settings?workspaceId=${workspace.id}`} className="text-xs underline text-sonate-ink">Paramètres</a>
+                    <button onClick={() => renameWorkspace(workspace.id, workspace.name)} className="text-xs text-sonate-ink underline" type="button">Renommer</button>
                     <button onClick={() => deleteWorkspace(workspace)} className="text-xs text-red-500" type="button">Supprimer</button>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-brand-dark mb-2">Membres</h3>
+                  <h3 className="text-sm font-medium text-sonate-green mb-2">Membres</h3>
                   {members.length === 0 ? (
                     <p className="text-xs text-gray-400">Aucun membre</p>
                   ) : (
@@ -219,7 +219,7 @@ function AssignUserForm({ users, onAssign }: { users: UserRow[]; onAssign: (user
           <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
         ))}
       </select>
-      <button disabled={loading || !effectiveSelectedUserId} type="submit" className="border border-gray-300 px-3 py-1.5 text-sm text-brand-dark disabled:opacity-50">
+      <button disabled={loading || !effectiveSelectedUserId} type="submit" className="border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink disabled:opacity-50">
         {loading ? "Ajout..." : "Ajouter user"}
       </button>
     </form>

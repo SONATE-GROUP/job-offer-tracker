@@ -68,10 +68,10 @@ export function AdminUsersClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-brand-dark">Utilisateurs</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-sonate-green">Utilisateurs</h1>
           <p className="text-sm text-gray-500 mt-1">{users.length} compte{users.length > 1 ? "s" : ""}</p>
         </div>
-        <button onClick={() => setShowCreate(true)} className="bg-brand-pink text-brand-dark px-4 py-2 rounded-lg text-sm font-medium">
+        <button onClick={() => setShowCreate(true)} className="bg-sonate-green text-sonate-ivory px-4 py-2 rounded-lg text-sm font-medium">
           + Créer un compte
         </button>
       </div>
@@ -79,10 +79,10 @@ export function AdminUsersClient() {
       {loading ? (
         <p className="text-gray-400 text-sm">Chargement...</p>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        <div className="bg-sonate-ivory-light rounded-xl border border-gray-200 overflow-hidden shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-brand-dark text-white">
+              <tr className="bg-sonate-green text-sonate-ivory">
                 <th className="text-left px-4 py-3">Nom</th>
                 <th className="text-left px-4 py-3">Email</th>
                 <th className="text-left px-4 py-3">Rôle</th>
@@ -94,7 +94,7 @@ export function AdminUsersClient() {
             <tbody>
               {users.map((user) => (
                 <tr key={user.id} className="border-t border-gray-100">
-                  <td className="px-4 py-3 font-medium text-brand-dark">{user.name}</td>
+                  <td className="px-4 py-3 font-medium text-sonate-ink">{user.name}</td>
                   <td className="px-4 py-3 text-gray-600">{user.email}</td>
                   <td className="px-4 py-3">{user.role}</td>
                   <td className="px-4 py-3 text-gray-600">{user.role === "ADMIN" ? "Tous (ADMIN)" : (
@@ -112,7 +112,7 @@ export function AdminUsersClient() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3 justify-end">
                       {user.workspaceId && (
-                        <Link href={`/settings?workspaceId=${user.workspaceId}`} className="text-xs underline text-brand-dark">
+                        <Link href={`/settings?workspaceId=${user.workspaceId}`} className="text-xs underline text-sonate-ink">
                           Paramètres
                         </Link>
                       )}
@@ -169,9 +169,9 @@ function CreateUserModal({ onClose, onCreated, workspaces }: { onClose: () => vo
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-        <h2 className="text-lg font-semibold mb-4 text-brand-dark">Créer un compte</h2>
+    <div className="fixed inset-0 bg-sonate-green-dark/50 flex items-center justify-center z-50">
+      <div className="bg-sonate-ivory-light rounded-xl shadow-xl p-6 w-full max-w-md">
+        <h2 className="text-lg font-semibold mb-4 text-sonate-green">Créer un compte</h2>
         {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Nom" className="w-full border px-3 py-2" />
@@ -190,7 +190,7 @@ function CreateUserModal({ onClose, onCreated, workspaces }: { onClose: () => vo
           )}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 border py-2 text-sm">Annuler</button>
-            <button type="submit" disabled={loading} className="flex-1 bg-brand-pink py-2 text-sm font-medium">
+            <button type="submit" disabled={loading} className="flex-1 bg-sonate-green py-2 text-sm font-medium">
               {loading ? "Création..." : "Créer"}
             </button>
           </div>

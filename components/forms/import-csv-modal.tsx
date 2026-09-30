@@ -193,11 +193,11 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
   const groupedFields = ["Offre", "Entreprise", "Lead", "Statuts"] as const;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-sonate-green-dark/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-sonate-ivory-light rounded-xl shadow-xl p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-brand-dark">
+            <h2 className="text-lg font-semibold text-sonate-green">
               {mode === "create" ? "Importer un CSV" : "Mettre à jour depuis un CSV"}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
@@ -206,7 +206,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
                 : "Remplit des offres déjà présentes, en les retrouvant par leur identifiant. Aucune offre n'est créée."}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-brand-dark text-xl" aria-label="Fermer">×</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-sonate-green text-xl" aria-label="Fermer">×</button>
         </div>
 
         {error && (
@@ -231,7 +231,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
               aria-pressed={mode === option.value}
               className={
                 mode === option.value
-                  ? "px-3 py-1.5 text-sm font-medium border border-brand-pink bg-brand-pink text-brand-dark"
+                  ? "px-3 py-1.5 text-sm font-medium border border-sonate-green bg-sonate-green text-sonate-ivory"
                   : "px-3 py-1.5 text-sm border border-gray-300 text-gray-600 hover:bg-gray-50"
               }
             >
@@ -241,12 +241,12 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
         </div>
 
         <div className="border border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 mb-5">
-          <label className="block text-sm font-medium text-brand-dark mb-2">Fichier CSV</label>
+          <label className="block text-sm font-medium text-sonate-ink mb-2">Fichier CSV</label>
           <input
             type="file"
             accept=".csv,text/csv"
             onChange={(event) => void handleFileChange(event.target.files?.[0])}
-            className="block w-full text-sm text-gray-600 file:mr-4 file:border-0 file:bg-brand-pink file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-dark hover:file:opacity-90"
+            className="block w-full text-sm text-gray-600 file:mr-4 file:border-0 file:bg-sonate-green file:px-4 file:py-2 file:text-sm file:font-medium file:text-sonate-ivory hover:file:opacity-90"
           />
           {fileName && (
             <p className="text-xs text-gray-500 mt-2">
@@ -256,8 +256,8 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
         </div>
 
         {headers.length > 0 && mode === "update" && (
-          <div className="border border-gray-200 rounded-lg p-4 mb-5 bg-brand-pink/10">
-            <h3 className="text-sm font-semibold text-brand-dark mb-3">Rapprochement</h3>
+          <div className="border border-gray-200 rounded-lg p-4 mb-5 bg-sonate-green-50">
+            <h3 className="text-sm font-semibold text-sonate-green mb-3">Rapprochement</h3>
             <label className="grid grid-cols-[220px_1fr] gap-2 items-center text-sm mb-3">
               <span className="text-gray-600">
                 Identifiant de l&apos;offre <span className="text-red-500">*</span>
@@ -268,7 +268,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
                   setIdColumn(event.target.value);
                   setSummary(null);
                 }}
-                className="border border-gray-300 px-2 py-1.5 text-sm text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink"
+                className="border border-gray-300 px-2 py-1.5 text-sm text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-1 focus:ring-sonate-orange"
               >
                 <option value="">Choisir une colonne…</option>
                 {headers.map((header) => (
@@ -285,7 +285,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
                   setSummary(null);
                 }}
                 className="mt-0.5 w-4 h-4"
-                style={{ accentColor: "#FFBEFA" }}
+                style={{ accentColor: "#123C33" }}
               />
               <span>
                 Ne remplir que les cellules vides
@@ -335,7 +335,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
             </div>
 
             <div className="mt-5 border border-gray-200 rounded-lg overflow-hidden">
-              <div className="bg-gray-50 px-3 py-2 text-sm font-medium text-brand-dark">Aperçu des 3 premières lignes</div>
+              <div className="bg-gray-50 px-3 py-2 text-sm font-medium text-sonate-ink">Aperçu des 3 premières lignes</div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-xs">
                   <thead>
@@ -362,7 +362,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
 
         {mode === "update" && summary && (
           <div className="mt-5 border border-gray-200 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-brand-dark mb-3">
+            <h3 className="text-sm font-semibold text-sonate-green mb-3">
               Simulation — rien n&apos;a encore été écrit
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
@@ -373,7 +373,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
             </div>
             {Object.keys(summary.fieldStats).length > 0 && (
               <div className="border border-gray-200 rounded-lg overflow-hidden mb-3">
-                <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-brand-dark">
+                <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-sonate-ink">
                   Détail par colonne, sur les {summary.matched} ligne{summary.matched > 1 ? "s" : ""} rapprochée{summary.matched > 1 ? "s" : ""}
                 </div>
                 <div className="overflow-x-auto">
@@ -391,7 +391,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
                     <tbody>
                       {Object.entries(summary.fieldStats).map(([key, stat]) => (
                         <tr key={key} className="border-b border-gray-100 last:border-0">
-                          <td className="px-3 py-2 text-brand-dark whitespace-nowrap">{fieldLabel(key)}</td>
+                          <td className="px-3 py-2 text-sonate-ink whitespace-nowrap">{fieldLabel(key)}</td>
                           <td className={cellClass(stat.toFill > 0)}>{stat.toFill}</td>
                           <td className="px-3 py-2 text-right text-gray-600">{stat.alreadyFilled}</td>
                           <td className="px-3 py-2 text-right text-gray-600">{stat.blankInCsv}</td>
@@ -437,7 +437,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
         )}
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 text-brand-dark hover:bg-gray-50">
+          <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 text-sonate-ink hover:bg-gray-50">
             Annuler
           </button>
 
@@ -445,7 +445,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
             <button
               onClick={() => void handleImport()}
               disabled={loading || rows.length === 0}
-              className="px-4 py-2 text-sm bg-brand-pink text-brand-dark font-medium hover:opacity-90 disabled:opacity-50"
+              className="px-4 py-2 text-sm bg-sonate-green text-sonate-ivory font-medium hover:bg-sonate-green-dark disabled:opacity-50"
             >
               {loading ? "Import…" : `Importer ${rows.length || ""} ligne${rows.length > 1 ? "s" : ""}`}
             </button>
@@ -454,7 +454,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
               <button
                 onClick={() => void handleUpdate(true)}
                 disabled={loading || rows.length === 0}
-                className="px-4 py-2 text-sm border border-brand-pink text-brand-dark font-medium hover:bg-brand-pink/20 disabled:opacity-50"
+                className="px-4 py-2 text-sm border border-sonate-green text-sonate-ink font-medium hover:bg-sonate-green-100 disabled:opacity-50"
               >
                 {loading && !summary ? "Vérification…" : "Vérifier"}
               </button>
@@ -462,7 +462,7 @@ export function ImportCsvModal({ customFields, workspaceId, onClose, onImported 
                 onClick={() => void handleUpdate(false)}
                 disabled={loading || !summary || summary.toUpdate === 0}
                 title={!summary ? "Lance d'abord une vérification" : undefined}
-                className="px-4 py-2 text-sm bg-brand-pink text-brand-dark font-medium hover:opacity-90 disabled:opacity-50"
+                className="px-4 py-2 text-sm bg-sonate-green text-sonate-ivory font-medium hover:bg-sonate-green-dark disabled:opacity-50"
               >
                 {loading && summary
                   ? "Mise à jour…"
@@ -493,7 +493,7 @@ function FieldGroup({
 }) {
   return (
     <div className="border border-gray-200 rounded-lg p-3">
-      <h3 className="text-sm font-semibold text-brand-dark mb-3">{title}</h3>
+      <h3 className="text-sm font-semibold text-sonate-green mb-3">{title}</h3>
       <div className="space-y-2">
         {fields.map((field) => (
           <label key={field.key} className="grid grid-cols-[150px_1fr] gap-2 items-center text-sm">
@@ -503,7 +503,7 @@ function FieldGroup({
             <select
               value={mapping[field.key] ?? ""}
               onChange={(event) => onChange(field.key, event.target.value)}
-              className="border border-gray-300 px-2 py-1.5 text-sm text-brand-dark bg-white focus:outline-none focus:ring-1 focus:ring-brand-pink"
+              className="border border-gray-300 px-2 py-1.5 text-sm text-sonate-ink bg-sonate-ivory-light focus:outline-none focus:ring-1 focus:ring-sonate-orange"
             >
               <option value="">Ne pas importer</option>
               {headers.map((header) => (
@@ -519,8 +519,8 @@ function FieldGroup({
 
 function SummaryStat({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) {
   return (
-    <div className={highlight ? "border border-brand-pink rounded-lg p-2 bg-brand-pink/10" : "border border-gray-200 rounded-lg p-2"}>
-      <div className="text-lg font-semibold text-brand-dark">{value}</div>
+    <div className={highlight ? "border border-sonate-green rounded-lg p-2 bg-sonate-green-50" : "border border-gray-200 rounded-lg p-2"}>
+      <div className="text-lg font-semibold text-sonate-ink">{value}</div>
       <div className="text-xs text-gray-500">{label}</div>
     </div>
   );
@@ -528,6 +528,6 @@ function SummaryStat({ label, value, highlight }: { label: string; value: number
 
 function cellClass(highlight: boolean): string {
   return highlight
-    ? "px-3 py-2 text-right font-semibold text-brand-dark"
+    ? "px-3 py-2 text-right font-semibold text-sonate-ink"
     : "px-3 py-2 text-right text-gray-400";
 }

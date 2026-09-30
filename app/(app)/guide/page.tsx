@@ -21,14 +21,14 @@ function AccordionItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="border border-gray-200 bg-white">
+    <div className="border border-gray-200 bg-sonate-ivory-light">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <span className="text-brand-pink">{section.icon}</span>
-          <span className="font-semibold text-brand-dark text-base">{section.title}</span>
+          <span className="text-sonate-orange-dark">{section.icon}</span>
+          <span className="font-semibold text-sonate-ink text-base">{section.title}</span>
         </div>
         <ChevronDown
           size={18}
@@ -50,7 +50,7 @@ function AccordionItem({
 function Step({ number, children }: { number: number; children: React.ReactNode }) {
   return (
     <div className="flex gap-3">
-      <span className="flex-shrink-0 w-6 h-6 bg-brand-pink text-brand-dark text-xs font-bold flex items-center justify-center">
+      <span className="flex-shrink-0 w-6 h-6 bg-sonate-green text-sonate-ivory text-xs font-bold flex items-center justify-center">
         {number}
       </span>
       <span className="leading-relaxed">{children}</span>
@@ -83,7 +83,7 @@ const sections: Section[] = [
         <p>Le tableau principal offre plusieurs façons de retrouver rapidement les offres qui vous intéressent.</p>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Recherche par mot-clé</p>
+          <p className="font-medium text-sonate-ink">Recherche par mot-clé</p>
           <Step number={1}>
             Utilisez la barre de recherche en haut du tableau pour filtrer les offres par intitulé de poste, entreprise, localisation ou source.
           </Step>
@@ -93,7 +93,7 @@ const sections: Section[] = [
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Filtre par statut</p>
+          <p className="font-medium text-sonate-ink">Filtre par statut</p>
           <Step number={1}>
             Cliquez sur le bouton <strong>Statut</strong> pour filtrer par statut de contact : <Badge color="yellow">À qualifier</Badge>, <Badge color="green">Contacté</Badge> ou <Badge color="red">Ne pas contacter</Badge>.
           </Step>
@@ -103,7 +103,7 @@ const sections: Section[] = [
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Tri des colonnes</p>
+          <p className="font-medium text-sonate-ink">Tri des colonnes</p>
           <Step number={1}>
             Cliquez sur l&apos;en-tête d&apos;une colonne pour trier le tableau selon cette colonne (ex : date de réception, entreprise...).
           </Step>
@@ -125,7 +125,7 @@ const sections: Section[] = [
         </p>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Afficher ou masquer des colonnes</p>
+          <p className="font-medium text-sonate-ink">Afficher ou masquer des colonnes</p>
           <Step number={1}>
             Cliquez sur le bouton <strong>Colonnes</strong> (icône en haut à droite du tableau) pour ouvrir le panneau de gestion des colonnes.
           </Step>
@@ -138,7 +138,7 @@ const sections: Section[] = [
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Redimensionner les colonnes</p>
+          <p className="font-medium text-sonate-ink">Redimensionner les colonnes</p>
           <Step number={1}>
             Positionnez votre curseur sur le bord droit d&apos;un en-tête de colonne jusqu&apos;à voir apparaître la flèche de redimensionnement.
           </Step>
@@ -175,7 +175,7 @@ const sections: Section[] = [
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Changer le statut d&apos;une offre</p>
+          <p className="font-medium text-sonate-ink">Changer le statut d&apos;une offre</p>
           <Step number={1}>
             Dans le tableau, repérez la colonne <strong>Statut</strong> sur la ligne de l&apos;offre concernée.
           </Step>
@@ -200,7 +200,7 @@ const sections: Section[] = [
         </p>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Marquer un lead pour enrichissement téléphonique</p>
+          <p className="font-medium text-sonate-ink">Marquer un lead pour enrichissement téléphonique</p>
           <Step number={1}>
             Localisez la colonne <strong>Téléphone</strong> sur la ligne du lead concerné.
           </Step>
@@ -229,7 +229,7 @@ const sections: Section[] = [
         </p>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Lancer l&apos;export</p>
+          <p className="font-medium text-sonate-ink">Lancer l&apos;export</p>
           <Step number={1}>
             Appliquez les filtres et la recherche souhaités pour sélectionner les offres à exporter (l&apos;export porte sur les données filtrées).
           </Step>
@@ -242,7 +242,7 @@ const sections: Section[] = [
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium text-brand-dark">Contenu de l&apos;export</p>
+          <p className="font-medium text-sonate-ink">Contenu de l&apos;export</p>
           <p>Le fichier CSV inclut toutes les colonnes actuellement <strong>visibles</strong> dans le tableau, y compris les champs personnalisés. Pour inclure ou exclure des colonnes, ajustez leur visibilité avant d&apos;exporter.</p>
         </div>
       </div>
@@ -253,9 +253,9 @@ const sections: Section[] = [
 function GeneralGuide() {
   return (
     <div className="mb-10">
-      <div className="bg-brand-dark text-white px-6 py-5 mb-6">
+      <div className="bg-sonate-green text-sonate-ivory px-6 py-5 mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <Zap size={18} className="text-brand-pink" />
+          <Zap size={18} className="text-sonate-orange" />
           <h2 className="text-base font-semibold">Comment ça fonctionne ?</h2>
         </div>
         <p className="text-sm text-gray-300">
@@ -265,12 +265,12 @@ function GeneralGuide() {
 
       <div className="space-y-3">
         {/* Step 0 - daily context */}
-        <div className="flex gap-4 p-5 border border-gray-200 bg-white">
-          <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-brand-dark font-bold text-sm flex items-center justify-center">
+        <div className="flex gap-4 p-5 border border-gray-200 bg-sonate-ivory-light">
+          <div className="flex-shrink-0 w-8 h-8 bg-gray-100 text-sonate-ink font-bold text-sm flex items-center justify-center">
             1
           </div>
           <div>
-            <p className="font-semibold text-brand-dark mb-1">Chaque jour, de nouvelles offres apparaissent</p>
+            <p className="font-semibold text-sonate-ink mb-1">Chaque jour, de nouvelles offres apparaissent</p>
             <p className="text-sm text-gray-600">
               Le fichier se met à jour automatiquement avec de nouvelles offres d&apos;emploi et le contact associé à chaque offre. Consultez le tableau chaque matin pour voir les nouvelles lignes.
             </p>
@@ -279,13 +279,13 @@ function GeneralGuide() {
 
         {/* Step 1 - contacter */}
         <div className="flex gap-4 p-5 border border-green-200 bg-green-50">
-          <div className="flex-shrink-0 w-8 h-8 bg-green-500 text-white font-bold text-sm flex items-center justify-center">
+          <div className="flex-shrink-0 w-8 h-8 bg-sonate-green-mid text-sonate-ivory font-bold text-sm flex items-center justify-center">
             2
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <CheckCircle2 size={16} className="text-green-600" />
-              <p className="font-semibold text-brand-dark">Cocher &quot;Contacter&quot; pour prospecter automatiquement</p>
+              <p className="font-semibold text-sonate-ink">Cocher &quot;Contacter&quot; pour prospecter automatiquement</p>
             </div>
             <p className="text-sm text-gray-700">
               Si le contact vous semble pertinent, cochez <strong>Contacter</strong> (1ère colonne). Le contact est alors <strong>automatiquement envoyé dans une campagne de prospection</strong>. Vous n&apos;avez rien d&apos;autre à faire. La date d&apos;envoi s&apos;affiche automatiquement dans la dernière colonne du tableau.
@@ -295,13 +295,13 @@ function GeneralGuide() {
 
         {/* Step 2 - ne pas contacter */}
         <div className="flex gap-4 p-5 border border-red-200 bg-red-50">
-          <div className="flex-shrink-0 w-8 h-8 bg-red-400 text-white font-bold text-sm flex items-center justify-center">
+          <div className="flex-shrink-0 w-8 h-8 bg-red-400 text-sonate-ivory font-bold text-sm flex items-center justify-center">
             3
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <XCircle size={16} className="text-red-500" />
-              <p className="font-semibold text-brand-dark">Cocher &quot;Ne pas contacter&quot; pour écarter le contact</p>
+              <p className="font-semibold text-sonate-ink">Cocher &quot;Ne pas contacter&quot; pour écarter le contact</p>
             </div>
             <p className="text-sm text-gray-700">
               Si le contact n&apos;est pas qualifié, cochez simplement <strong>Ne pas contacter</strong>. Il ne sera pas inclus dans la campagne et sera mis de côté.
@@ -310,14 +310,14 @@ function GeneralGuide() {
         </div>
 
         {/* Step 3 - chercher tel */}
-        <div className="flex gap-4 p-5 border border-blue-200 bg-blue-50">
-          <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white font-bold text-sm flex items-center justify-center">
+        <div className="flex gap-4 p-5 border border-sonate-cream-border bg-sonate-ivory-light">
+          <div className="flex-shrink-0 w-8 h-8 bg-sonate-green text-sonate-ivory font-bold text-sm flex items-center justify-center">
             +
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <PhoneCall size={16} className="text-blue-600" />
-              <p className="font-semibold text-brand-dark">En option : cocher &quot;Chercher tél&quot; pour prospecter par téléphone</p>
+              <PhoneCall size={16} className="text-sonate-green" />
+              <p className="font-semibold text-sonate-ink">En option : cocher &quot;Chercher tél&quot; pour prospecter par téléphone</p>
             </div>
             <p className="text-sm text-gray-700">
               Si vous souhaitez également appeler le contact (en complément de la campagne), cochez <strong>Chercher tél</strong>. Le numéro de téléphone s&apos;affichera automatiquement au bout de quelques secondes. C&apos;est ensuite à vous d&apos;appeler le prospect.
@@ -343,7 +343,7 @@ export default function GuidePage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-brand-dark">Guide d&apos;utilisation</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-sonate-green">Guide d&apos;utilisation</h1>
         <p className="text-sm text-gray-500 mt-1">
           Retrouvez ici les explications pour utiliser les principales fonctionnalités de l&apos;outil.
         </p>
