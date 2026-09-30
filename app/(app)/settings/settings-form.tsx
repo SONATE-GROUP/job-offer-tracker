@@ -35,7 +35,45 @@ const AI_PROVIDERS = [
     placeholder: "sk-proj-...",
     docsUrl: "https://platform.openai.com/api-keys",
   },
+  {
+    id: "openrouter",
+    name: "OpenRouter",
+    company: "OpenRouter",
+    model: "modèle au choix",
+    placeholder: "sk-or-v1-...",
+    docsUrl: "https://openrouter.ai/settings/keys",
+  },
 ] as const;
+
+const DEFAULT_OPENROUTER_MODEL = "openai/gpt-4o-mini";
+
+// Utilisée si le catalogue OpenRouter ne peut pas être chargé
+const FALLBACK_OPENROUTER_MODELS: OpenRouterModel[] = [
+  { id: "openai/gpt-4o-mini", name: "OpenAI: GPT-4o-mini", promptPrice: null, completionPrice: null },
+  { id: "anthropic/claude-haiku-4.5", name: "Anthropic: Claude Haiku 4.5", promptPrice: null, completionPrice: null },
+  { id: "google/gemini-2.5-flash", name: "Google: Gemini 2.5 Flash", promptPrice: null, completionPrice: null },
+  { id: "mistralai/mistral-small-3.2-24b-instruct", name: "Mistral: Mistral Small 3.2 24B", promptPrice: null, completionPrice: null },
+  { id: "meta-llama/llama-3.3-70b-instruct", name: "Meta: Llama 3.3 70B Instruct", promptPrice: null, completionPrice: null },
+];
+
+interface OpenRouterModel {
+  id: string;
+  name: string;
+  promptPrice: number | null;
+  completionPrice: number | null;
+}
+
+function formatPrice(p: number | null): string {
+  if (p == null) return "?";
+  if (p === 0) return "0";
+  return p < 1 ? p.toFixed(2) : p.toFixed(p < 10 ? 1 : 0);
+}
+
+function modelLabel(m: OpenRouterModel): string {
+  if (m.promptPrice == null && m.completionPrice == null) return m.name;
+  if (m.promptPrice === 0 && m.completionPrice === 0) return `${m.name} (gratuit)`;
+  return `${m.name} ($${formatPrice(m.promptPrice)} / $${formatPrice(m.completionPrice)} par M tokens)`;
+}
 
 type ProviderId = (typeof AI_PROVIDERS)[number]["id"];
 
@@ -64,7 +102,12 @@ export function SettingsForm({ workspaces }: { workspaces: Workspace[] }) {
     gemini: "",
     groq: "",
     openai: "",
+    openrouter: "",
   });
+  const [openrouterModel, setOpenrouterModel] = useState(DEFAULT_OPENROUTER_MODEL);
+  const [openrouterModels, setOpenrouterModels] = useState<OpenRouterModel[]>(FALLBACK_OPENROUTER_MODELS);
+  const [openrouterModelsError, setOpenrouterModelsError] = useState(false);
+  const [modelSearch, setModelSearch] = useState("");
 
   // Other
   const [mantiksApiKey, setMantiksApiKey] = useState("");
@@ -109,7 +152,9 @@ export function SettingsForm({ workspaces }: { workspaces: Workspace[] }) {
           gemini: data.geminiApiKey ?? "",
           groq: data.groqApiKey ?? "",
           openai: data.openaiApiKey ?? "",
+          openrouter: data.openrouterApiKey ?? "",
         });
+        setOpenrouterModel(data.openrouterModel || DEFAULT_OPENROUTER_MODEL);
 
         // Other
         setMantiksApiKey(data.mantiksApiKey ?? "");
@@ -120,6 +165,32 @@ export function SettingsForm({ workspaces }: { workspaces: Workspace[] }) {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [selectedWorkspaceId]);
+
+  useEffect(() => {
+    fetch("/api/openrouter/models")
+      .then((r) => {
+        if (!r.ok) throw new Error(`Erreur ${r.status}`);
+        return r.json();
+      })
+      .then((models: OpenRouterModel[]) => {
+        if (Array.isArray(models) && models.length > 0) setOpenrouterModels(models);
+      })
+      .catch(() => setOpenrouterModelsError(true));
+  }, []);
+
+  const filteredOpenrouterModels = (() => {
+    const q = modelSearch.trim().toLowerCase();
+    const list = q
+      ? openrouterModels.filter((m) => m.name.toLowerCase().includes(q) || m.id.toLowerCase().includes(q))
+      : openrouterModels;
+    // Le modèle enregistré reste toujours sélectionnable, même hors filtre ou hors catalogue
+    if (openrouterModel && !list.some((m) => m.id === openrouterModel)) {
+      const current = openrouterModels.find((m) => m.id === openrouterModel)
+        ?? { id: openrouterModel, name: openrouterModel, promptPrice: null, completionPrice: null };
+      return [current, ...list];
+    }
+    return list;
+  })();
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -138,6 +209,8 @@ export function SettingsForm({ workspaces }: { workspaces: Workspace[] }) {
         geminiApiKey: aiKeys.gemini,
         groqApiKey: aiKeys.groq,
         openaiApiKey: aiKeys.openai,
+        openrouterApiKey: aiKeys.openrouter,
+        openrouterModel,
         mantiksApiKey,
         apolloApiKey,
         phoneEnrichmentProvider,
@@ -435,7 +508,7 @@ export function SettingsForm({ workspaces }: { workspaces: Workspace[] }) {
               <label className="block text-sm font-medium text-sonate-ink mb-2">
                 Fournisseur actif
               </label>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
                 {AI_PROVIDERS.map((p) => {
                   const isActive = aiProvider === p.id;
                   return (
@@ -451,7 +524,7 @@ export function SettingsForm({ workspaces }: { workspaces: Workspace[] }) {
                     >
                       <div className="font-medium text-sm">{p.name}</div>
                       <div className={`text-xs mt-0.5 ${isActive ? "text-sonate-ivory/70" : "text-gray-400"}`}>
-                        {p.model}
+                        {p.id === "openrouter" && openrouterModel ? openrouterModel : p.model}
                       </div>
                     </button>
                   );
@@ -490,6 +563,33 @@ export function SettingsForm({ workspaces }: { workspaces: Workspace[] }) {
                       placeholder={p.placeholder}
                       className="w-full border border-gray-300 px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange bg-sonate-ivory-light"
                     />
+                    {p.id === "openrouter" && (
+                      <div className="mt-3 space-y-1.5">
+                        <label className="block text-xs font-medium text-sonate-ink">Modèle</label>
+                        <input
+                          type="text"
+                          value={modelSearch}
+                          onChange={(e) => setModelSearch(e.target.value)}
+                          placeholder={`Filtrer parmi ${openrouterModels.length} modèles (ex. claude, gpt, mistral...)`}
+                          className="w-full border border-gray-300 px-3 py-1.5 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange bg-sonate-ivory-light"
+                        />
+                        <select
+                          value={openrouterModel}
+                          onChange={(e) => setOpenrouterModel(e.target.value)}
+                          className="w-full border border-gray-300 px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange bg-sonate-ivory-light"
+                        >
+                          {filteredOpenrouterModels.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {modelLabel(m)}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-xs text-gray-500">
+                          Identifiant : <code className="font-mono">{openrouterModel}</code>
+                          {openrouterModelsError && " · catalogue OpenRouter indisponible, liste réduite affichée"}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 );
               })}

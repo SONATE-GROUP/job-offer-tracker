@@ -31,7 +31,7 @@ const FIELD_TYPES = [
   { value: "BOOLEAN", label: "Case à cocher" },
   { value: "DATE", label: "Date" },
   { value: "FORMULA", label: "Formule" },
-  { value: "AI", label: "IA (généré par Claude/Gemini/Groq/OpenAI)" },
+  { value: "AI", label: "IA (généré par Claude/Gemini/Groq/OpenAI/OpenRouter)" },
 ];
 
 const FORMULA_VARS = [

@@ -40,6 +40,8 @@ model Workspace {
   geminiApiKey   String?
   groqApiKey     String?
   openaiApiKey   String?
+  openrouterApiKey String?
+  openrouterModel  String?
   mantiksApiKey             String?
   apolloApiKey              String?
   phoneEnrichmentProvider   String?  @default("apollo")

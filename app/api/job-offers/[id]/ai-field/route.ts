@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const workspace = await prisma.workspace.findUnique({
     where: { id: offer.workspaceId },
-    select: { aiProvider: true, claudeApiKey: true, geminiApiKey: true, groqApiKey: true, openaiApiKey: true },
+    select: { aiProvider: true, claudeApiKey: true, geminiApiKey: true, groqApiKey: true, openaiApiKey: true, openrouterApiKey: true, openrouterModel: true },
   });
   if (!workspace) return NextResponse.json({ error: "Workspace introuvable" }, { status: 404 });
 

@@ -83,6 +83,8 @@ export async function POST(
       geminiApiKey: true,
       groqApiKey: true,
       openaiApiKey: true,
+      openrouterApiKey: true,
+      openrouterModel: true,
     },
   });
 
