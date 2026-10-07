@@ -916,7 +916,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 bg-sonate-ivory-light shadow-sm">
+      <div className="overflow-auto max-h-[calc(100vh-8rem)] border border-gray-200 bg-sonate-ivory-light shadow-sm">
         <table
           className="text-sm border-collapse"
           style={{ tableLayout: "fixed", width: "max-content", minWidth: "100%" }}
@@ -925,7 +925,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
             <tr className="bg-sonate-green border-b border-sonate-green-dark">
               {/* delete placeholder col */}
               <th
-                style={{ width: 36, position: "sticky", left: 0, zIndex: 3, background: "#123C33" }}
+                style={{ width: 36, position: "sticky", top: 0, left: 0, zIndex: 4, background: "#123C33" }}
                 className="px-1 py-3"
               />
               {visibleFixed.map((col) => {
@@ -937,10 +937,11 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     key={col.key}
                     style={{
                       width: getColWidth(col.key, col.defaultWidth),
-                      position: isSticky ? "sticky" : "relative",
+                      position: "sticky",
+                      top: 0,
                       left: isSticky ? 36 : undefined,
-                      zIndex: isSticky ? 3 : undefined,
-                      background: isSticky ? "#123C33" : undefined,
+                      zIndex: isSticky ? 4 : 3,
+                      background: "#123C33",
                     }}
                     className="text-left px-3 py-3 font-medium text-sonate-ivory whitespace-nowrap select-none"
                   >
@@ -969,7 +970,10 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                   key={field.id}
                   style={{
                     width: getColWidth(field.id, CUSTOM_FIELD_DEFAULT_WIDTH),
-                    position: "relative",
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 3,
+                    background: "#123C33",
                   }}
                   className="text-left px-3 py-3 font-medium text-sonate-ivory whitespace-nowrap select-none"
                 >
