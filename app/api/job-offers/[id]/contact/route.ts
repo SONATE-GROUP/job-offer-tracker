@@ -196,15 +196,29 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         const emeliCustom: Record<string, string> = {};
         // Entreprise and Civilite come from offer fields — reserve them to avoid duplicates
         const emeliaReservedCustomFields = new Set(["Entreprise", "Civilite"]);
+        const emeliaSkippedFields: string[] = [];
         for (const field of customFields) {
-          if (!field.emeliAttribute) continue;
+          if (!field.emeliAttribute) {
+            emeliaSkippedFields.push(`${field.name} (pas d'attribut Emelia)`);
+            continue;
+          }
           const val = customValues[field.name];
-          if (val == null || val === "") continue;
-          if (emeliaReservedCustomFields.has(field.emeliAttribute)) continue;
+          if (val == null || val === "") {
+            emeliaSkippedFields.push(`${field.name} (valeur vide)`);
+            continue;
+          }
+          if (emeliaReservedCustomFields.has(field.emeliAttribute)) {
+            emeliaSkippedFields.push(`${field.name} (attribut réservé ${field.emeliAttribute})`);
+            continue;
+          }
           emeliCustom[field.emeliAttribute] = String(val);
         }
         if (offer.company) emeliCustom.Entreprise = offer.company;
         if (offer.leadCivility) emeliCustom.Civilite = offer.leadCivility;
+        console.log(`[Emelia] Champs personnalisés envoyés (offre ${offer.id}):`, JSON.stringify(emeliCustom));
+        if (emeliaSkippedFields.length > 0) {
+          console.log(`[Emelia] Champs personnalisés ignorés (offre ${offer.id}): ${emeliaSkippedFields.join(", ")}`);
+        }
 
         // Extrait dans une const : la narrowing de workspace.emeliApiKey (non-null
         // ici) ne survit pas à sa capture dans les fermetures ci-dessous.
