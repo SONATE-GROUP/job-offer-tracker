@@ -26,7 +26,7 @@ export function Navbar({ user }: NavbarProps) {
   ];
 
   return (
-    <header className="bg-sonate-green px-6 py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-40 bg-sonate-green px-6 py-3 flex items-center justify-between">
       <nav className="flex items-center gap-6">
         <Link href="/dashboard" className="flex items-center gap-3 mr-4 shrink-0">
           <Image
