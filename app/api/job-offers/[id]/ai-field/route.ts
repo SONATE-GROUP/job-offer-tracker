@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { callAIProvider } from "@/lib/ai-generate";
+import { setCustomValue } from "@/lib/custom-values";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -33,9 +34,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   try {
     const value = await callAIProvider(workspace, prompt, offer);
-    const customValues = JSON.parse(offer.customValues || "{}");
-    customValues[field.name] = value;
-    await prisma.jobOffer.update({ where: { id: offerId }, data: { customValues: JSON.stringify(customValues) } });
+    // Écriture atomique : plusieurs champs IA sont générés en parallèle sur une même offre.
+    await setCustomValue(offerId, field.name, value);
     return NextResponse.json({ value });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Erreur IA";
