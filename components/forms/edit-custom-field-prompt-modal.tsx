@@ -8,6 +8,9 @@ interface CustomField {
   label: string;
   type: string;
   formula?: string | null;
+  lgmAttribute?: string | null;
+  emeliAttribute?: string | null;
+  autoFill?: boolean;
 }
 
 interface ExistingField {
@@ -39,6 +42,14 @@ const AI_VARS_BASE = FORMULA_VARS.map((v) => ({
   label: v.label,
 }));
 
+const LGM_OPTIONS = [
+  { value: "", label: "Ne pas envoyer à LGM" },
+  ...Array.from({ length: 10 }, (_, i) => ({
+    value: `customAttribute${i + 1}`,
+    label: `customAttribute${i + 1}`,
+  })),
+];
+
 export function EditCustomFieldPromptModal({
   field,
   existingCustomFields = [],
@@ -46,10 +57,15 @@ export function EditCustomFieldPromptModal({
   onUpdated,
 }: EditCustomFieldPromptModalProps) {
   const [formula, setFormula] = useState(field.formula ?? "");
+  const [emeliAttribute, setEmeliAttribute] = useState(field.emeliAttribute ?? "");
+  const [lgmAttribute, setLgmAttribute] = useState(field.lgmAttribute ?? "");
+  const [autoFill, setAutoFill] = useState(field.autoFill === true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const isAI = field.type === "AI";
+  const hasFormula = isAI || field.type === "FORMULA";
+  const supportsExport = field.type !== "FORMULA";
 
   const vars = isAI
     ? [
@@ -68,7 +84,11 @@ export function EditCustomFieldPromptModal({
     const res = await fetch(`/api/custom-fields/${field.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ formula }),
+      body: JSON.stringify({
+        ...(hasFormula ? { formula } : {}),
+        ...(supportsExport ? { emeliAttribute, lgmAttribute } : {}),
+        ...(isAI ? { autoFill } : {}),
+      }),
     });
 
     if (res.ok) {
@@ -85,7 +105,7 @@ export function EditCustomFieldPromptModal({
     <div className="fixed inset-0 bg-sonate-green-dark/50 flex items-center justify-center z-50">
       <div className="bg-sonate-ivory-light rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-semibold mb-1 text-sonate-green">
-          Modifier le {isAI ? "prompt IA" : "formule"} — {field.label}
+          Paramètres du champ : {field.label}
         </h2>
 
         {error && (
@@ -95,6 +115,7 @@ export function EditCustomFieldPromptModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          {hasFormula && (
           <div>
             <label className="block text-sm font-medium text-sonate-ink mb-1">
               {isAI ? "Prompt IA" : "Formule"}
@@ -125,6 +146,60 @@ export function EditCustomFieldPromptModal({
               </p>
             )}
           </div>
+          )}
+
+          {isAI && (
+            <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-200 px-4 py-3 hover:bg-gray-50">
+              <input
+                type="checkbox"
+                checked={autoFill}
+                onChange={(e) => setAutoFill(e.target.checked)}
+                className="mt-0.5 w-4 h-4 cursor-pointer shrink-0"
+                style={{ accentColor: "#123C33" }}
+              />
+              <div>
+                <span className="text-sm font-medium text-sonate-ink">Remplissage automatique</span>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Ce champ sera généré par l&apos;IA à chaque nouvelle offre reçue via webhook, en arrière-plan.
+                </p>
+              </div>
+            </label>
+          )}
+
+          {supportsExport && (
+            <div>
+              <label className="block text-sm font-medium text-sonate-ink mb-1">
+                Envoyer vers Emelia <span className="text-gray-400 font-normal">(clé du champ custom)</span>
+              </label>
+              <input
+                type="text"
+                value={emeliAttribute}
+                onChange={(e) => setEmeliAttribute(e.target.value)}
+                placeholder="Ex: Posteclean, certain..."
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                {emeliAttribute
+                  ? <>La valeur sera envoyée dans <code className="bg-gray-100 px-1 rounded">contact.{emeliAttribute}</code> lors du clic sur CONTACTER.</>
+                  : "Vide : ce champ n'est pas envoyé à Emelia."}
+              </p>
+            </div>
+          )}
+
+          {supportsExport && (
+            <div>
+              <label className="block text-sm font-medium text-sonate-ink mb-1">Envoyer vers LGM</label>
+              <select
+                value={lgmAttribute}
+                onChange={(e) => setLgmAttribute(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-sonate-ink focus:outline-none focus:ring-2 focus:ring-sonate-orange"
+              >
+                {LGM_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="flex gap-3 pt-2">
             <button

@@ -44,10 +44,21 @@ export async function POST(req: NextRequest) {
   const existing = await prisma.customFieldDef.findFirst({ where: { workspaceId, name } });
   if (existing) return NextResponse.json({ error: "Un champ avec ce nom existe déjà. Choisissez un label différent." }, { status: 409 });
 
+  if (typeof emeliAttribute === "string" && emeliAttribute.trim()) {
+    const others = await prisma.customFieldDef.findMany({ where: { workspaceId }, select: { label: true, emeliAttribute: true } });
+    const clash = others.find((f) => f.emeliAttribute?.toLowerCase() === emeliAttribute.trim().toLowerCase());
+    if (clash) {
+      return NextResponse.json(
+        { error: `La clé Emelia "${emeliAttribute}" est déjà utilisée par le champ "${clash.label}". Une seule colonne par clé, sinon l'une écrase l'autre.` },
+        { status: 409 }
+      );
+    }
+  }
+
   const count = await prisma.customFieldDef.count({ where: { workspaceId } });
 
   const field = await prisma.customFieldDef.create({
-    data: { workspaceId, name, label, type: fieldType, formula: formula ?? null, lgmAttribute: lgmAttribute ?? null, emeliAttribute: emeliAttribute ?? null, autoFill: autoFill === true, order: count },
+    data: { workspaceId, name, label, type: fieldType, formula: formula ?? null, lgmAttribute: lgmAttribute ?? null, emeliAttribute: typeof emeliAttribute === "string" && emeliAttribute.trim() ? emeliAttribute.trim() : null, autoFill: autoFill === true, order: count },
   });
 
   return NextResponse.json(field, { status: 201 });

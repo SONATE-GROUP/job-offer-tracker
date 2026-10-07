@@ -15,6 +15,7 @@ interface CustomField {
   type: string;
   formula?: string | null;
   lgmAttribute?: string | null;
+  emeliAttribute?: string | null;
   autoFill?: boolean;
 }
 
@@ -981,15 +982,13 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
                     {field.type === "AI" && <span title="Champ IA">⚡</span>}
                     {field.type === "FORMULA" && <span title="Champ formule">ƒ</span>}
                     {field.label}
-                    {(field.type === "AI" || field.type === "FORMULA") && (
-                      <button
-                        onClick={() => setEditingPromptField(field)}
-                        className="text-sonate-ivory/30 hover:text-sonate-ivory ml-1 text-xs"
-                        title={field.type === "AI" ? "Modifier le prompt IA" : "Modifier la formule"}
-                      >
-                        ✎
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setEditingPromptField(field)}
+                      className="text-sonate-ivory/30 hover:text-sonate-ivory ml-1 text-xs"
+                      title="Paramètres du champ"
+                    >
+                      ✎
+                    </button>
                     <button
                       onClick={() => deleteCustomField(field.id)}
                       className="text-sonate-ivory/30 hover:text-red-400 ml-1 text-xs"
@@ -1688,7 +1687,7 @@ export function OffersTable({ customFields: initialCustomFields, targetWorkspace
           onClose={() => setEditingPromptField(null)}
           onUpdated={(updated) => {
             setCustomFields((prev) =>
-              prev.map((f) => (f.id === updated.id ? { ...f, formula: updated.formula } : f))
+              prev.map((f) => (f.id === updated.id ? { ...f, ...updated } : f))
             );
             setEditingPromptField(null);
           }}
